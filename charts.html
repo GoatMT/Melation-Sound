@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
-<link rel="stylesheet" href="charts.css">
+<link rel="stylesheet" href="charts.css?v=20260827-1">
 </head>
 <body class="label-page charts-page">
 <header class="label-header"><nav class="label-nav wrap" aria-label="Main navigation">
@@ -28,7 +28,7 @@
   <p class="label-kicker">Melation Sound · listener activity</p>
   <h1 class="label-page-title">Charts</h1>
   <p class="label-subpage-intro">See which songs are getting the most attention, likes, and dislikes across the catalog. Open any result to listen, read, and react.</p>
-  <p class="charts-local-note">Charts are saved on this device. They become shared site-wide charts when a connected database is added.</p>
+  <p class="charts-local-note">Charts sync site-wide through Firestore when connected. A local fallback is used if the database is temporarily unavailable.</p>
   <section class="charts-grid" aria-label="Melation Sound charts">
     <article class="chart-panel"><div class="chart-panel-head"><div><p class="label-kicker">01 · Reach</p><h2>Most viewed</h2></div><span>Views</span></div><div class="chart-list" id="viewsChart"></div></article>
     <article class="chart-panel"><div class="chart-panel-head"><div><p class="label-kicker">02 · Love</p><h2>Most liked</h2></div><span>Likes</span></div><div class="chart-list" id="likesChart"></div></article>
