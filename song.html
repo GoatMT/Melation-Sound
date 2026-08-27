@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="melation-sound.png">
+<link rel="apple-touch-icon" href="melation-sound.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#020509">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Melation Sound">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Song details, lyrics, and streaming from Melation Sound.">
+<title>Song · Melation Sound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="label.css">
+<link rel="stylesheet" href="song.css">
+</head>
+<body class="song-page label-page">
+<header class="label-header"><nav class="label-nav wrap" aria-label="Main navigation">
+  <a class="label-brand" href="index.html" aria-label="Melation Sound home"><img src="melation-sound.png" alt="Melation Sound M logo"><span class="label-brand-name">MELATION <span>SOUND</span></span></a>
+  <div class="label-links"><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Listeners</a><a href="about.html">About</a><a href="album.html">A Broken Dream</a></div>
+</nav></header>
+<main class="song-main">
+  <section class="song-stage" aria-labelledby="songTitle">
+    <div class="song-heading">
+      <p class="song-kicker" id="songType">Album track</p>
+      <h1 id="songTitle">Loading song</h1>
+      <p class="song-artist" id="songArtist">Melation Sound</p>
+      <p class="song-release" id="songRelease">A Broken Dream</p>
+      <div class="song-heading-actions"><a id="songBack" href="album.html">Back to release</a><button type="button" id="songPlayTop">Play song</button></div>
+      <div class="song-engagement" aria-label="Song listener activity">
+        <div class="song-engagement-stats"><span><strong id="songViewCount">0</strong> views</span><span><strong id="songLikeCount">0</strong> likes</span><span><strong id="songDislikeCount">0</strong> dislikes</span></div>
+        <div class="song-reaction-actions"><button type="button" id="songLike" aria-pressed="false" aria-label="Like this song">Like</button><button type="button" id="songDislike" aria-pressed="false" aria-label="Dislike this song">Dislike</button><a href="charts.html">View charts →</a></div>
+      </div>
+    </div>
+    <div class="song-disc-column">
+      <div class="song-disc" id="songDisc" aria-label="Song record artwork">
+        <span class="song-disc-groove groove-one"></span><span class="song-disc-groove groove-two"></span><span class="song-disc-groove groove-three"></span>
+        <div class="song-disc-art"><img id="songArt" src="album-cover.png" alt=""></div><span class="song-disc-hole"></span>
+      </div>
+      <p class="song-disc-caption">Now playing · Melation Sound</p>
+    </div>
+    <section class="song-lyrics-card" aria-labelledby="lyricsTitle">
+      <div class="song-card-heading"><div><p class="song-card-kicker">Words &amp; meaning</p><h2 id="lyricsTitle">Lyrics</h2></div><span id="lyricsStatus">Track page</span></div>
+      <div class="song-lyrics" id="songLyrics">Loading lyrics…</div>
+    </section>
+  </section>
+  <section class="song-details" aria-labelledby="detailsTitle">
+    <div class="song-card-heading"><div><p class="song-card-kicker">Release information</p><h2 id="detailsTitle">Details</h2></div><span id="songTrackNumber">Track 01</span></div>
+    <div class="song-detail-grid" id="songDetails"></div>
+  </section>
+  <section class="song-community" aria-labelledby="commentsTitle">
+    <div class="song-card-heading"><div><p class="song-card-kicker">Listener conversation</p><h2 id="commentsTitle">Comments</h2></div><span>Community</span></div>
+    <div class="song-community-body"><p class="song-comment-note" id="songCommentNote">Loading comments…</p><form class="song-comment-form" id="songCommentForm"><textarea id="songCommentText" maxlength="500" placeholder="Share your thoughts on this song…" aria-label="Write a comment"></textarea><button type="submit">Post comment</button></form><div class="song-comment-list" id="songCommentList"></div></div>
+  </section>
+</main>
+<footer class="song-footer"><div class="wrap"><div class="song-footer-row"><span>Melation Sound</span><div class="song-footer-links"><a href="index.html">Home</a><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Listeners</a></div></div><p>© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
+<section class="private-gate" id="privateGate" hidden aria-labelledby="privateGateTitle">
+  <div class="private-gate-card">
+    <p class="private-gate-kicker">Melation Sound · private song</p><h1 id="privateGateTitle">10:20</h1>
+    <p class="private-gate-copy">This song is currently private. Enter the password to open its song page.</p>
+    <form class="private-gate-form" id="privateGateForm"><label for="privateGatePassword">Password</label><div class="private-gate-input-row"><input id="privateGatePassword" type="password" autocomplete="current-password" required><button type="submit">Enter</button></div><p class="private-gate-error" id="privateGateError" role="alert" aria-live="polite"></p></form>
+    <p class="private-gate-note">Private access screen · streaming remains free after entry.</p>
+  </div>
+</section>
+<div id="label-player-mount" data-label-start="0"></div>
+<script src="engagement.js"></script>
+<script src="song-page.js"></script>
+<script src="label-player.js"></script>
+<script src="firebase-config.js"></script>
+<script type="module" src="community.js"></script>
+</body>
+</html>
