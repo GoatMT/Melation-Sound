@@ -1,38 +1,58 @@
 rules_version = '2';
+
+// Melation uses the same Firestore-only account model as the LSL site:
+// username + PIN hash, with no Firebase Authentication account. Because
+// Firestore Rules cannot verify that client-side identity, these rules shape
+// the data but cannot prevent a determined client from impersonating a user.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
+    match /melationSound/{releaseId} {
       allow read: if true;
-      allow create, update: if request.auth != null && request.auth.uid == userId;
-      allow delete: if false;
-    }
+      allow write: if false;
 
-    match /users/{userId}/listens/{songId} {
-      allow read: if true;
-      allow create, update: if request.auth != null && request.auth.uid == userId;
-      allow delete: if request.auth != null && request.auth.uid == userId;
-    }
+      match /accounts/{accountId} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasAll([
+          "username", "usernameKey", "displayName", "pinHash", "createdAtMs"
+        ]);
+        allow update: if request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(["displayName", "totalSeconds", "uniqueSongs", "plays", "updatedAtMs"]);
+        allow delete: if false;
 
-    match /users/{userId}/reactions/{songId} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
-    }
+        match /listens/{songId} {
+          allow read: if true;
+          allow create, update: if request.resource.data.keys().hasAll([
+            "songId", "title", "artist", "art", "seconds", "plays", "updatedAtMs"
+          ]);
+          allow delete: if false;
+        }
 
-    match /songs/{songId} {
-      allow read: if true;
-      allow create, update: if request.auth != null;
-      allow delete: if false;
-    }
+        match /reactions/{songId} {
+          allow read: if true;
+          allow create, update: if request.resource.data.keys().hasAll([
+            "songId", "type", "title", "artist", "art", "updatedAtMs"
+          ]) && request.resource.data.type in ["like", "dislike"];
+          allow delete: if true;
+        }
+      }
 
-    match /songs/{songId}/reactions/{userId} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
-    }
+      match /songs/{songId} {
+        allow read: if true;
+        allow create, update: if request.resource.data.keys().hasAll([
+          "id", "title", "artist", "art", "views", "likesBy", "dislikesBy", "updatedAtMs"
+        ]);
+        allow delete: if false;
+      }
 
-    match /songs/{songId}/comments/{commentId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      match /songComments/{songId}/comments/{commentId} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasAll([
+          "author", "usernameKey", "body", "createdAtMs"
+        ]) && request.resource.data.body is string
+          && request.resource.data.body.size() > 0
+          && request.resource.data.body.size() <= 500;
+        allow update, delete: if false;
+      }
     }
   }
 }

@@ -56,6 +56,41 @@
   var communityPlayedFor = '';
   var communityLastReportedTime = 0;
   var STATE_KEY = 'melationPlayerState';
+  var accountGate = null;
+
+  function hasListenerAccount() {
+    var service = window.MelationCommunity;
+    return !!(service && typeof service.user === 'function' && service.user());
+  }
+  function closeAccountGate() {
+    if (!accountGate) return;
+    accountGate.hidden = true;
+    document.body.classList.remove('has-account-gate');
+  }
+  function showAccountGate() {
+    if (!accountGate) {
+      accountGate = document.createElement('div');
+      accountGate.className = 'label-account-gate';
+      accountGate.id = 'labelAccountGate';
+      accountGate.hidden = true;
+      accountGate.setAttribute('role', 'dialog');
+      accountGate.setAttribute('aria-modal', 'true');
+      accountGate.setAttribute('aria-labelledby', 'labelAccountGateTitle');
+      accountGate.innerHTML = '<div class="label-account-gate-card"><button type="button" class="label-account-gate-close" data-account-gate-close aria-label="Close account prompt">✕</button><p class="label-account-gate-kicker">Melation Sound · listener access</p><h2 id="labelAccountGateTitle">Make an account to listen.</h2><p>Create a free account or sign in before streaming songs, saving listening history, liking tracks, disliking tracks, or commenting.</p><div class="label-account-gate-actions"><a class="label-account-gate-primary" href="community.html">Go to Account</a><button type="button" class="label-account-gate-secondary" data-account-gate-close>Keep browsing</button></div></div>';
+      document.body.appendChild(accountGate);
+      accountGate.querySelectorAll('[data-account-gate-close]').forEach(function (button) { button.addEventListener('click', closeAccountGate); });
+      accountGate.addEventListener('click', function (event) { if (event.target === accountGate) closeAccountGate(); });
+    }
+    accountGate.hidden = false;
+    document.body.classList.add('has-account-gate');
+    var destination = accountGate.querySelector('.label-account-gate-primary');
+    if (destination) destination.focus();
+  }
+  function requireListenerAccount() {
+    if (hasListenerAccount()) return true;
+    showAccountGate();
+    return false;
+  }
 
   function readState() {
     try { return JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); } catch (e) { return null; }
@@ -119,6 +154,7 @@
   };
   function loadTrack(index, autoplay) {
     if (!tracks[index]) return;
+    if (autoplay && !requireListenerAccount()) return;
     currentIndex = index;
     var track = tracks[index];
     communityPlayedFor = '';
@@ -144,13 +180,14 @@
   window.melationPlayTrack = function (index) {
     if (!tracks[index]) return;
     if (index === currentIndex) {
-      if (audio.paused) audio.play().catch(function () {}); else audio.pause();
+      if (audio.paused) { if (!requireListenerAccount()) return; audio.play().catch(function () {}); } else audio.pause();
     } else {
       loadTrack(index, true);
     }
   };
 
   play.addEventListener('click', function () {
+    if (!requireListenerAccount()) return;
     if (currentIndex < 0) loadTrack(0, false);
     if (audio.paused) audio.play().catch(function () {}); else audio.pause();
   });
@@ -198,7 +235,7 @@
       var index = parseInt(button.getAttribute('data-label-track') || '0', 10);
       index = isFinite(index) && tracks[index] ? index : 0;
       if (index === currentIndex) {
-        if (audio.paused) audio.play().catch(function () {}); else audio.pause();
+        if (audio.paused) { if (!requireListenerAccount()) return; audio.play().catch(function () {}); } else audio.pause();
       } else {
         loadTrack(index, true);
       }
