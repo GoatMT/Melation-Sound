@@ -25,7 +25,10 @@ let remoteRooms = [];
 let remoteRoomsReady = false;
 let roomCounts = {};
 let roomViewers = {};
+let roomRequests = {};
 let presenceUnsubscribers = new Map();
+let requestUnsubscribers = new Map();
+let ownRequestUnsubscribers = new Map();
 let activePresenceRef = null;
 let presenceId = '';
 let lastPlaybackSignature = '';
@@ -51,6 +54,7 @@ function isOwner(room) { return room.owner === 'local' || (room.ownerKey && room
 function listenerLabel(room) { if (Object.prototype.hasOwnProperty.call(roomCounts, room.id) && roomCounts[room.id] !== null) return roomCounts[room.id] + (roomCounts[room.id] === 1 ? ' listener' : ' listeners'); return 'Live count unavailable'; }
 function viewerEntries(room) { return Array.isArray(roomViewers[room.id]) ? roomViewers[room.id] : []; }
 function viewerNames(room) { return viewerEntries(room).map(viewer => viewer.viewerName).filter(Boolean); }
+function pendingRequests(room) { return Array.isArray(roomRequests[room.id]) ? roomRequests[room.id].filter(request => request.status === 'pending') : []; }
 function livePayload(room) { return { id:room.id, name:room.name, viewerCount:Number(roomCounts[room.id]) || 0, viewers:viewerNames(room) }; }
 function syncLivePlayer(room) { if (window.melationUpdateLiveRoom) window.melationUpdateLiveRoom(livePayload(room)); }
 function ensureLiveStatus() { let element=document.getElementById('roomsLiveStatus'); if (element) return element; const heading=document.querySelector('.rooms-section-head'); if (!heading) return null; element=document.createElement('p'); element.id='roomsLiveStatus'; element.className='rooms-live-status'; element.setAttribute('role','status'); element.setAttribute('aria-live','polite'); heading.insertAdjacentElement('afterend',element); return element; }
@@ -75,9 +79,12 @@ function renderHostPanel(rooms) {
   const stage=document.getElementById('roomsStage');
   if (stage) stage.classList.remove('has-host-panel');
   if (!room) { panel.hidden=true; return; }
-  const viewers=viewerEntries(room); panel.hidden=false;
-  panel.innerHTML='<p class="label-kicker">Host controls</p><h3>'+escapeHtml(room.name)+'</h3><p class="room-host-panel-meta">'+viewers.length+' of '+roomCapacity(room)+' listeners · live room</p><div class="room-host-viewer-list">'+(viewers.length ? viewers.map(viewer=>'<div class="room-host-viewer"><span><strong>'+escapeHtml(viewer.viewerName||'Listener')+'</strong><small>Listening now</small></span>'+(viewer.id===presenceId?'<em>You</em>':'<button type="button" data-room-kick="'+escapeHtml(room.id)+'" data-viewer-id="'+escapeHtml(viewer.id)+'" data-viewer-name="'+escapeHtml(viewer.viewerName||'Listener')+'">Kick</button>')+'</div>').join(''):'<p class="room-host-empty">No listeners are in your room yet.</p>')+'</div><p class="room-host-panel-note">Kicked listeners are removed from this live session.</p>';
+  const viewers=viewerEntries(room); const requests=pendingRequests(room); panel.hidden=false;
+  const requestsHtml='<section class="room-host-requests"><div class="room-host-requests-head"><span>Join requests</span><strong>'+requests.length+'</strong></div>'+(requests.length ? '<div class="room-host-request-list">'+requests.map(request=>'<div class="room-host-request"><span><strong>'+escapeHtml(request.viewerName||'Listener')+'</strong><small>Wants to join</small></span><div><button type="button" data-room-request-add="'+escapeHtml(room.id)+'" data-request-id="'+escapeHtml(request.id)+'" data-request-name="'+escapeHtml(request.viewerName||'Listener')+'">Add</button><button type="button" data-room-request-ignore="'+escapeHtml(room.id)+'" data-request-id="'+escapeHtml(request.id)+'" data-request-name="'+escapeHtml(request.viewerName||'Listener')+'">Ignore</button></div></div>').join('')+'</div>' : '<p class="room-host-request-empty">No pending requests.</p>')+'</section>';
+  panel.innerHTML='<p class="label-kicker">Host controls</p><h3>'+escapeHtml(room.name)+'</h3><p class="room-host-panel-meta">'+viewers.length+' of '+roomCapacity(room)+' listeners · live room</p><div class="room-host-viewer-list">'+(viewers.length ? viewers.map(viewer=>'<div class="room-host-viewer"><span><strong>'+escapeHtml(viewer.viewerName||'Listener')+'</strong><small>Listening now</small></span>'+(viewer.id===presenceId?'<em>You</em>':'<button type="button" data-room-kick="'+escapeHtml(room.id)+'" data-viewer-id="'+escapeHtml(viewer.id)+'" data-viewer-name="'+escapeHtml(viewer.viewerName||'Listener')+'">Kick</button>')+'</div>').join(''):'<p class="room-host-empty">No listeners are in your room yet.</p>')+'</div>'+requestsHtml+'<p class="room-host-panel-note">Kicked listeners are removed from this live session.</p>';
   panel.querySelectorAll('[data-room-kick]').forEach(button=>button.addEventListener('click',()=>kickViewer(button.dataset.roomKick,button.dataset.viewerId,button.dataset.viewerName)));
+  panel.querySelectorAll('[data-room-request-add]').forEach(button=>button.addEventListener('click',()=>respondToJoinRequest(button.dataset.roomRequestAdd,button.dataset.requestId,button.dataset.requestName,'approved')));
+  panel.querySelectorAll('[data-room-request-ignore]').forEach(button=>button.addEventListener('click',()=>respondToJoinRequest(button.dataset.roomRequestIgnore,button.dataset.requestId,button.dataset.requestName,'ignored')));
 }
 function ensureFullDialog() {
   let dialog=document.getElementById('roomFullDialog'); if (dialog) return dialog;
@@ -86,12 +93,50 @@ function ensureFullDialog() {
   document.body.appendChild(dialog); dialog.querySelectorAll('[data-room-full-close]').forEach(button=>button.addEventListener('click',()=>{dialog.hidden=true;})); return dialog;
 }
 function showFullDialog(room) { const dialog=ensureFullDialog(); dialog.dataset.roomId=room.id; dialog.querySelector('#roomFullCopy').textContent=room.name+' has reached its '+roomCapacity(room)+' listener limit.'; dialog.querySelector('#roomFullStatus').textContent=''; dialog.hidden=false; dialog.querySelector('#roomFullAsk').onclick=()=>requestToJoin(room,dialog); dialog.querySelector('#roomFullAsk').focus(); }
-async function requestToJoin(room,dialog) { const status=dialog.querySelector('#roomFullStatus'); if (!db) { status.textContent='Your request is saved only on this device until Firebase reconnects.'; return; } const user=currentUser(); try { await setDoc(doc(db,ROOT,ROOT_ID,'rooms',room.id,'requests',getOwnerKey()),{viewerName:String(user?.displayName||user?.username||'Listener').slice(0,40),viewerKey:String(user?.usernameKey||getOwnerKey()),createdAtMs:Date.now(),status:'pending'}); status.textContent='Request sent to the host.'; } catch (error) { status.textContent='Could not send your request. Try again shortly.'; } }
+function watchRequestDecision(room, dialog) {
+  if (!db || ownRequestUnsubscribers.has(room.id)) return;
+  const reference = doc(db, ROOT, ROOT_ID, 'rooms', room.id, 'requests', getOwnerKey());
+  let stop = null;
+  stop = onSnapshot(reference, snapshot => {
+    const request = snapshot.exists() ? snapshot.data() : null;
+    if (!request || request.status === 'pending') return;
+    if (stop) stop();
+    ownRequestUnsubscribers.delete(room.id);
+    const status = dialog && dialog.querySelector('#roomFullStatus');
+    if (request.status === 'approved') {
+      if (dialog) dialog.hidden = true;
+      setStatus('The host added you to “' + room.name + '”. Joining now.');
+      join(room.id, { approved:true });
+    } else if (request.status === 'ignored') {
+      if (status) status.textContent = 'The host did not add you to this room.';
+    }
+  }, () => {});
+  ownRequestUnsubscribers.set(room.id, stop);
+}
+async function requestToJoin(room,dialog) {
+  const status=dialog.querySelector('#roomFullStatus');
+  if (!db) { status.textContent='Join requests need Firebase before they can reach the host.'; return; }
+  const user=currentUser();
+  try {
+    await setDoc(doc(db,ROOT,ROOT_ID,'rooms',room.id,'requests',getOwnerKey()),{viewerName:String(user?.displayName||user?.username||'Listener').slice(0,40),viewerKey:String(user?.usernameKey||getOwnerKey()),createdAtMs:Date.now(),status:'pending'});
+    watchRequestDecision(room,dialog);
+    status.textContent='Request sent to the host. Waiting for a response.';
+  } catch (error) { status.textContent='Could not send your request. Try again shortly.'; }
+}
+async function respondToJoinRequest(roomId, requestId, viewerName, decision) {
+  const room = allRooms().find(item => item.id === roomId);
+  if (!room || !isOwner(room) || !db) return;
+  try {
+    await setDoc(doc(db,ROOT,ROOT_ID,'rooms',roomId,'requests',requestId), { status:decision, respondedAtMs:Date.now(), responderKey:getOwnerKey() }, { merge:true });
+    setStatus(decision === 'approved' ? viewerName + ' was added to the room.' : viewerName + '\u2019s request was ignored.');
+  } catch (error) { setStatus('Could not update that join request.', true); }
+}
 async function kickViewer(roomId,viewerId,viewerName) { if (!db) { setStatus('Viewer controls need Firebase to remove a listener.'); return; } try { await setDoc(doc(db,ROOT,ROOT_ID,'rooms',roomId,'presence',viewerId),{kicked:true,kickedAtMs:Date.now()},{merge:true}); setStatus(viewerName+' was removed from your room.'); } catch (error) { setStatus('Could not remove that listener.'); } }
 
 function render() {
   const list = document.getElementById('roomsList'); if (!list) return;
   const rooms = allRooms();
+  watchJoinRequests(rooms);
   const count = document.getElementById('roomsOnlineCount');
   if (count) count.textContent = rooms.length + (rooms.length === 1 ? ' room active' : ' rooms active');
   list.innerHTML = rooms.length ? rooms.map((room, index) => {
@@ -103,6 +148,22 @@ function render() {
   list.querySelectorAll('[data-room-id]').forEach(button => button.addEventListener('click', () => join(button.dataset.roomId)));
   list.querySelectorAll('[data-room-off]').forEach(button => button.addEventListener('click', () => turnOff(button.dataset.roomOff)));
   renderHostPanel(rooms);
+}
+
+function watchJoinRequests(roomList) {
+  const hostedIds = new Set(roomList.filter(isOwner).map(room => room.id));
+  requestUnsubscribers.forEach((unsubscribe, roomId) => {
+    if (!hostedIds.has(roomId)) { unsubscribe(); requestUnsubscribers.delete(roomId); delete roomRequests[roomId]; }
+  });
+  roomList.filter(isOwner).forEach(room => {
+    if (requestUnsubscribers.has(room.id) || !db) return;
+    const requestsRef = collection(db, ROOT, ROOT_ID, 'rooms', room.id, 'requests');
+    const unsubscribe = onSnapshot(requestsRef, snapshot => {
+      roomRequests[room.id] = snapshot.docs.map(item => ({ id:item.id, ...item.data() })).filter(request => request.status === 'pending');
+      render();
+    }, () => { roomRequests[room.id] = []; render(); });
+    requestUnsubscribers.set(room.id, unsubscribe);
+  });
 }
 
 function watchPresence(roomList) {
@@ -158,11 +219,11 @@ async function joinPresence(roomId) {
   } catch (error) { activePresenceRef = null; lastPresenceHeartbeatMs = 0; }
 }
 
-async function join(id) {
+async function join(id, options={}) {
   const room = allRooms().find(item => item.id === id); if (!room) return;
   if (!hasAccount()) { if (window.melationOpenAccountGate) window.melationOpenAccountGate(); setStatus('Make an account or sign in to join this room.'); return; }
   const liveCount = roomCounts[room.id];
-  if (Number.isFinite(liveCount) && liveCount >= roomCapacity(room)) { showFullDialog(room); return; }
+  if (!options.approved && Number.isFinite(liveCount) && liveCount >= roomCapacity(room)) { showFullDialog(room); return; }
   const queue = roomTrackIds(room).map(trackId => { const item = tracks[trackId]; return { id:trackId, name:item.title, artist:item.artist, src:item.src, art:item.art, page:item.page }; });
   if (window.melationLeaveLiveRoom) window.melationLeaveLiveRoom();
   if (window.melationSetQueue) window.melationSetQueue(queue);

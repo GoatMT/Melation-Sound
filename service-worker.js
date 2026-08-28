@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melation-sound-shell-v11';
+const CACHE_NAME = 'melation-sound-shell-v12';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

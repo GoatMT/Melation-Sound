@@ -1,9 +1,5 @@
 rules_version = '2';
 
-// Melation uses the same Firestore-only account model as the LSL site:
-// username + PIN hash, with no Firebase Authentication account. Because
-// Firestore Rules cannot verify that client-side identity, these rules shape
-// the data but cannot prevent a determined client from impersonating a user.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /melationSound/{releaseId} {
@@ -78,7 +74,7 @@ service cloud.firestore {
 
         match /requests/{requestId} {
           allow read: if true;
-          allow create, update: if request.resource.data.keys().hasAll([
+          allow create: if request.resource.data.keys().hasAll([
             "viewerName", "viewerKey", "createdAtMs", "status"
           ]) && request.resource.data.viewerName is string
             && request.resource.data.viewerName.size() > 0
@@ -86,6 +82,12 @@ service cloud.firestore {
             && request.resource.data.viewerKey is string
             && request.resource.data.createdAtMs is number
             && request.resource.data.status == "pending";
+          allow update: if request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(["status", "respondedAtMs", "responderKey"])
+            && request.resource.data.status in ["approved", "ignored"]
+            && request.resource.data.respondedAtMs is number
+            && request.resource.data.responderKey is string
+            && get(/databases/$(database)/documents/melationSound/main/rooms/$(roomId)).data.ownerKey == request.resource.data.responderKey;
           allow delete: if false;
         }
       }
@@ -100,10 +102,6 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
-      // Download keys are stored by SHA-256 hash; the raw 13-digit key is not
-      // written to Firestore. This client-only admin model is a convenience
-      // gate, not secure payment DRM. Use Firebase Auth + a trusted backend
-      // before relying on it for protected sales.
       match /downloadKeys/{keyHash} {
         allow read: if true;
         allow create: if request.resource.data.keys().hasAll([
