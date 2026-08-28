@@ -53,3 +53,5 @@
   .playlist-track-duration { margin-left: 55px; }
   .playlist-remove { margin-left: auto; }
 }
+.playlist-open-link { display: inline-block; margin-top: 16px; color: var(--community-blue, #62b2ff); font: 10px 'Space Mono', monospace; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+.playlist-open-link:hover { color: #fff; }

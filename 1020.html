@@ -18,8 +18,8 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
 <link rel="stylesheet" href="release.css">
-<link rel="stylesheet" href="site-motion.css?v=20260827-5"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-1"></head>
-<body class="release-page single-release-page private-single-page private-locked">
+<link rel="stylesheet" href="site-motion.css?v=20260827-6"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-2"></head>
+<body class="release-page single-release-page private-single-page">
 <section class="private-gate" id="privateGate" aria-labelledby="privateGateTitle">
   <div class="private-gate-card">
     <p class="private-gate-kicker">Melation Sound · private release</p>
@@ -39,6 +39,8 @@
     var form = document.getElementById('privateGateForm');
     var input = document.getElementById('privateGatePassword');
     var error = document.getElementById('privateGateError');
+    // Set to true when this release should become password protected again.
+    var passwordProtectionEnabled = false;
     var unlockedKey = 'melation1020Unlocked';
     var passwordHash = 'fcfd078f912f086bda4b4caa4cb792aafc28735c70f24d70e87978908cbdd2a3';
     function hasAccess(){ try { return sessionStorage.getItem(unlockedKey) === 'yes'; } catch (e) { return false; } }
@@ -54,9 +56,12 @@
       }
       return Promise.resolve('');
     }
-    if (hasAccess()) openRelease();
+    if (!passwordProtectionEnabled) openRelease();
+    else if (hasAccess()) openRelease();
+    else { document.body.classList.add('private-locked'); gate.hidden = false; }
     form.addEventListener('submit', function(event){
       event.preventDefault();
+      if (!passwordProtectionEnabled) return;
       hash(input.value).then(function(value){
         if (value === passwordHash) { error.textContent = ''; openRelease(); }
         else { error.textContent = 'That password is not correct.'; input.select(); }
@@ -95,7 +100,7 @@
   </div></section>
   <div class="release-banner"><p class="release-banner-text">10:20 · MT</p></div>
 </main>
-<footer class="release-footer"><div class="wrap"><div class="release-footer-row"><span>MT · 10:20</span><div class="release-footer-links"><a href="index.html">Melation Sound</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a></div></div><p class="release-footer-note">© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
-<div id="label-player-mount" data-label-start="0"></div><script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="label-player.js?v=20260827-3"></script>
-<script src="site-search.js?v=20260827-1"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
+<footer class="release-footer"><div class="wrap"><div class="release-footer-row"><span>MT · 10:20</span><div class="footer-utility-links"><a href="profile.html">Profile</a><a href="playlist.html">Playlist</a><a href="achievements.html">Achievements</a><a href="updates.html">Updates</a><a href="admin.html">Admin</a></div></div><p class="release-footer-note">© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
+<div id="label-player-mount" data-label-start="0"></div><script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-4"></script><script src="label-player.js?v=20260827-3"></script>
+<script src="site-search.js?v=20260827-3"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
 </html>

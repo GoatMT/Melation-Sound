@@ -8,6 +8,7 @@ const ADMIN_HASH = '8b81926e7cd4de108c33c4dd884f866cb934922602b16a4553ad519c03f9
 const SESSION_KEY = 'melationAdminUnlocked';
 let db = null;
 let accounts = null;
+let songs = null;
 
 function normalize(value) { return String(value || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function escape(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]); }
@@ -21,6 +22,7 @@ async function initFirestore() {
   const app = getApps().find(item => item.name === 'adminTools') || initializeApp(config, 'adminTools');
   db = getFirestore(app);
   accounts = collection(db, ROOT, ROOT_ID, 'accounts');
+  songs = collection(db, ROOT, ROOT_ID, 'songs');
 }
 async function account(key) { const snapshot = await getDoc(doc(accounts, key)); return snapshot.exists() ? snapshot.data() : null; }
 async function copySubcollection(fromKey, toKey, name) {
@@ -80,11 +82,27 @@ function bindAction(buttonId, statusId, action) {
   if (!button) return;
   button.addEventListener('click', async () => { setStatus(statusId, 'Working…'); try { await action(); } catch (error) { setStatus(statusId, error.message || 'Action failed.', true); } });
 }
+async function loadAnalytics() {
+  if (!db || !accounts || !songs) return;
+  try {
+    const [accountSnapshot, songSnapshot] = await Promise.all([getDocs(accounts), getDocs(songs)]);
+    let plays=0, views=0, likes=0, dislikes=0;
+    accountSnapshot.forEach(item => { plays += Number(item.data().plays) || 0; });
+    const rows = songSnapshot.docs.map(item => ({id:item.id, ...item.data()})).sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0));
+    rows.forEach(item => { views += Number(item.views) || 0; likes += Array.isArray(item.likesBy) ? item.likesBy.length : Number(item.likes) || 0; dislikes += Array.isArray(item.dislikesBy) ? item.dislikesBy.length : Number(item.dislikes) || 0; });
+    const values = {analyticsAccounts:accountSnapshot.size, analyticsPlays:plays, analyticsViews:views, analyticsLikes:likes, analyticsDislikes:dislikes};
+    Object.entries(values).forEach(([id,value]) => { const target=document.getElementById(id); if(target) target.textContent=value; });
+    const target=document.getElementById('analyticsSongs');
+    if(target) target.innerHTML=rows.length ? rows.map((item,index) => '<div class="admin-analytics-row"><span>'+String(index+1).padStart(2,'0')+'</span><strong>'+escape(item.title||item.id)+'</strong><small>'+(Number(item.views)||0)+' views · '+(Array.isArray(item.likesBy)?item.likesBy.length:0)+' likes · '+(Array.isArray(item.dislikesBy)?item.dislikesBy.length:0)+' dislikes</small></div>').join('') : '<p class="admin-status">No song activity yet.</p>';
+    setStatus('adminAnalyticsUpdated','Updated just now.');
+  } catch (error) { setStatus('adminAnalyticsUpdated','Analytics unavailable.',true); }
+}
 function showTools() {
   document.getElementById('adminGate').hidden = true;
   const tools = document.getElementById('adminTools');
   tools.hidden = false;
   tools.querySelectorAll('input, button').forEach(control => { control.disabled = false; });
+  loadAnalytics();
 }
 function bindGate() {
   const form = document.getElementById('adminGateForm');
@@ -95,5 +113,5 @@ bindGate();
 bindAction('adminMergeButton', 'adminMergeStatus', mergeAccounts);
 bindAction('adminUsernameButton', 'adminUsernameStatus', changeUsername);
 bindAction('adminPinButton', 'adminPinStatus', resetPin);
-initFirestore().catch(error => setStatus('adminFirebaseStatus', error.message, true));
+initFirestore().then(() => { try { if (sessionStorage.getItem(SESSION_KEY) === 'yes') loadAnalytics(); } catch (error) {} }).catch(error => setStatus('adminFirebaseStatus', error.message, true));
 try { if (sessionStorage.getItem(SESSION_KEY) === 'yes') showTools(); } catch (error) {}

@@ -191,6 +191,18 @@
       loadTrack(index, true);
     }
   };
+  window.melationSetQueue = function (queue) {
+    if (privateReleasePage || !Array.isArray(queue) || !queue.length) return false;
+    tracks = queue.map(function (track) { return { id:track.id, name:track.name || track.title, artist:track.artist, src:track.src, art:track.art, page:track.page || track.href }; });
+    currentIndex = -1;
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+    player.classList.remove('open', 'is-playing');
+    updateNavState();
+    updateButtons();
+    return true;
+  };
 
   play.addEventListener('click', function () {
     if (!requireListenerAccount()) return;

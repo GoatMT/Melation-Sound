@@ -8,7 +8,7 @@
 
   var catalog = [
     { title: 'A Broken Dream', meta: 'Album · Osama, MT', action: 'Open album', href: 'album.html', terms: 'a broken dream album osama mt' },
-    { title: '10:20', meta: 'Single · MT · Private', action: 'Open single', href: '1020.html', terms: '10 20 1020 single mt' },
+    { title: '10:20', meta: 'Single · MT', action: 'Open single', href: '1020.html', terms: '10 20 1020 single mt' },
     { title: 'A Dreams A Mystery', meta: 'Song · Osama, MT · A Broken Dream', action: 'Open song page', href: 'song.html?track=01', terms: 'a dreams a mystery song osama mt' },
     { title: 'Nightmare Fuel', meta: 'Song · Osama, MT and Adam · A Broken Dream', action: 'Open song page', href: 'song.html?track=02', terms: 'nightmare fuel song osama mt adam' },
     { title: "Nawaf's Stole Pain", meta: 'Bonus track · Bassam · A Broken Dream', action: 'Open song page', href: 'song.html?track=11', terms: 'nawaf stole pain bassam bonus track' },
@@ -16,7 +16,10 @@
     { title: 'Timeline', meta: 'Melation Sound · release archive', action: 'View timeline', href: 'timeline.html', terms: 'timeline releases dates' },
     { title: 'Charts', meta: 'Melation Sound · listeners and songs', action: 'View charts', href: 'charts.html', terms: 'charts views likes dislikes listeners' },
     { title: 'About', meta: 'Melation Sound · the label', action: 'About the label', href: 'about.html', terms: 'about label melation sound' },
-    { title: 'Account', meta: 'Melation Sound · listener profiles', action: 'Open account', href: 'community.html', terms: 'account profile listener playlist' }
+    { title: 'Account', meta: 'Melation Sound · listener profiles', action: 'Open account', href: 'community.html', terms: 'account profile listener playlist' },
+    { title: 'Playlist', meta: 'Melation Sound · listener collection', action: 'Open playlist', href: 'playlist.html', terms: 'playlist tracks play reorder share' },
+    { title: 'Achievements', meta: 'Melation Sound · listener milestones', action: 'View achievements', href: 'achievements.html', terms: 'achievements milestones streaks' },
+    { title: 'Updates', meta: 'Melation Sound · release log', action: 'View updates', href: 'updates.html', terms: 'updates news releases new music' }
   ];
 
   function escapeHtml(value) {

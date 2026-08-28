@@ -27,3 +27,17 @@
 .admin-lock { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: #ffadad; font: 9px 'Space Mono', monospace; letter-spacing: .05em; text-transform: uppercase; }
 .admin-lock::before { content: '•'; color: #ff8585; font-size: 18px; }
 @media (max-width: 850px) { .admin-grid { grid-template-columns: 1fr; } .admin-tool p { min-height: 0; } }
+.admin-analytics { grid-column: 1 / -1; border: 1px solid var(--label-line); background: linear-gradient(145deg, #0b1827, #050b12); }
+.admin-analytics-head { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; padding:24px; border-bottom:1px solid var(--label-line); }
+.admin-analytics-head h2 { margin:7px 0 0; color:#fff; font:38px 'Bebas Neue',sans-serif; letter-spacing:.06em; text-transform:uppercase; }
+.admin-analytics-head>span { color:var(--label-muted); font:9px 'Space Mono',monospace; text-transform:uppercase; }
+.admin-analytics-stats { display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--label-line); }
+.admin-analytics-stats div { padding:18px; background:#071019; }
+.admin-analytics-stats strong { display:block; color:#fff; font:32px 'Bebas Neue',sans-serif; }
+.admin-analytics-stats span { display:block; margin-top:3px; color:var(--label-muted); font:8px 'Space Mono',monospace; letter-spacing:.08em; text-transform:uppercase; }
+.admin-analytics-songs { display:grid; gap:1px; padding:1px 0 0; background:var(--label-line); }
+.admin-analytics-row { display:grid; grid-template-columns:34px minmax(150px,.7fr) 1fr; gap:14px; align-items:center; padding:14px 20px; background:#071019; }
+.admin-analytics-row>span { color:var(--label-blue-soft); font:14px 'Space Mono',monospace; }
+.admin-analytics-row strong { color:#fff; font:20px 'Bebas Neue',sans-serif; letter-spacing:.04em; text-transform:uppercase; }
+.admin-analytics-row small { color:var(--label-muted); font:9px 'Space Mono',monospace; text-transform:uppercase; }
+@media (max-width: 600px) { .admin-analytics-head { align-items:flex-start; flex-direction:column; } .admin-analytics-stats { grid-template-columns:repeat(2,1fr); } .admin-analytics-row { grid-template-columns:28px 1fr; } .admin-analytics-row small { grid-column:2; } }

@@ -198,6 +198,31 @@ footer {
   animation: melation-page-in .48s .14s cubic-bezier(.22,.8,.3,1) both;
 }
 
+.footer-utility-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  font: 11px 'Space Mono', monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.footer-utility-links a {
+  color: var(--label-muted, #8a9caf);
+  text-decoration: none;
+  transition: color .18s ease, transform .18s ease;
+}
+
+.footer-utility-links a:hover,
+.footer-utility-links a:focus-visible,
+.footer-utility-links a[aria-current="page"] {
+  color: var(--label-blue-soft, #62b2ff);
+}
+
+.footer-utility-links a:hover {
+  transform: translateY(-2px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
