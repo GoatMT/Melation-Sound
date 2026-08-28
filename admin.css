@@ -10,6 +10,10 @@
 .admin-gate button:hover { background: #d7edff; border-color: #d7edff; }
 .admin-gate form p { min-height: 16px; margin: 12px 0 0; color: #ffadad; font: 10px 'Space Mono', monospace; }
 .admin-warning { margin-bottom: 22px; padding: 17px 19px; color: #ffd0d0; border: 1px solid rgba(255,133,133,.35); background: rgba(120,24,32,.16); font: 11px/1.7 'Space Mono', monospace; }
+.admin-status { grid-column: 1 / -1; margin: -4px 0 0; color: #9ed1ff; font: 10px/1.6 'Space Mono', monospace; }
+.admin-status.is-error,
+.admin-lock.is-error { color: #ffadad; }
+.admin-lock:empty { display: none; }
 .admin-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .admin-grid[hidden] { display: none; }
 .admin-grid .admin-warning { grid-column: 1 / -1; margin: 0; }
