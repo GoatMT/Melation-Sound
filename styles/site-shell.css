@@ -31,3 +31,16 @@
 @keyframes map-pulse{0%{transform:scale(.7);opacity:.8}70%{transform:scale(1.8);opacity:.2}100%{transform:scale(.7);opacity:.8}}
 @media(max-width:800px){.room-create-panel,.map-layout{grid-template-columns:1fr}.rooms-grid{grid-template-columns:1fr}.rooms-section-head{align-items:flex-start;flex-direction:column}.label-timeline::before{left:7px}.timeline-item::before{left:0}.map-stats{grid-template-columns:1fr}.listener-map-visual{min-height:340px}}
 @media(prefers-reduced-motion:reduce){.room-card,.map-pulse{animation:none;opacity:1}}
+
+/* Keep the community pages calm and easy to scan. */
+.rooms-shell,.map-shell{max-width:1040px}
+.rooms-command-bar{margin:34px 0 54px;padding:16px 0;border-width:1px 0;background:transparent}
+.rooms-command-bar strong{font-size:20px}.rooms-primary-button,.map-save-button{padding:11px 14px}
+.room-create-panel{margin:-22px 0 54px;padding:22px;border-color:rgba(98,178,255,.55);background:#07101a;box-shadow:none}
+.room-create-panel h2,.map-panel h2{font-size:38px}.room-create-panel p:not(.label-kicker),.map-panel>p:not(.label-kicker){margin-top:10px;font-size:13px}
+.rooms-section{margin-bottom:0}.rooms-section-head{margin-bottom:14px}.rooms-section-head h2{font-size:46px}.rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.room-card{padding:18px;background:#07101a;box-shadow:none}.room-card h3{margin:24px 0 3px;font-size:30px}.room-track{margin:18px 0;padding:11px}.room-track strong{font-size:18px}
+.room-card-bottom{align-items:flex-start;flex-direction:column;gap:8px}.room-card-bottom button{padding:0;text-align:left}
+.map-layout{margin-top:40px;gap:16px}.listener-map-visual{min-height:360px;background:radial-gradient(circle at 56% 45%,rgba(22,135,255,.16),transparent 32%),#07101a}.map-grid{transform:none;background-size:42px 42px;opacity:.25}.map-panel{padding:24px;background:#07101a;box-shadow:none}.map-panel label{margin-top:22px}.map-stats{margin-top:16px}.map-stats div{padding:18px}.map-stats strong{font-size:32px}
+@media(max-width:900px){.rooms-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.rooms-command-bar{align-items:flex-start;flex-direction:column}.room-create-panel{grid-template-columns:1fr}.rooms-grid{grid-template-columns:1fr}.listener-map-visual{min-height:300px}}
