@@ -2,10 +2,10 @@
   var STORAGE_KEY = 'melationEngagement';
   var SESSION_KEY = 'melationViewedSongs';
   var CATALOG = [
-    { id:'01', title:'A Dreams A Mystery', artist:'Osama, MT', art:'album-cover.png', href:'song.html?track=01' },
-    { id:'02', title:'Nightmare Fuel', artist:'Osama, MT and Adam', art:'Nightmare Fuel.png', href:'song.html?track=02' },
-    { id:'11', title:"Nawaf's Stole Pain", artist:'Bassam', art:"Nawaf's Stole Pain.png", href:'song.html?track=11' },
-    { id:'10-20', title:'10:20', artist:'MT', art:'1020.png', href:'song.html?track=10-20', private:true }
+    { id:'01', title:'A Dreams A Mystery', artist:'Osama, MT', art:'albums/a-broken-dream/assets/album-cover.png', href:'songs/song.html?track=01' },
+    { id:'02', title:'Nightmare Fuel', artist:'Osama, MT and Adam', art:'albums/a-broken-dream/assets/Nightmare Fuel.png', href:'songs/song.html?track=02' },
+    { id:'11', title:"Nawaf's Stole Pain", artist:'Bassam', art:"albums/a-broken-dream/assets/Nawaf's Stole Pain.png", href:'songs/song.html?track=11' },
+    { id:'10-20', title:'10:20', artist:'MT', art:'singles/10-20/assets/1020.png', href:'songs/song.html?track=10-20', private:true }
   ];
   function blank(){ return { views:0, likes:0, dislikes:0, reaction:null }; }
   function read(){

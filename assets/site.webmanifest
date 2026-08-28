@@ -1,8 +1,8 @@
 {
   "name": "Melation Sound",
   "short_name": "Melation Sound",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "../index.html",
+  "scope": "../",
   "display": "standalone",
   "background_color": "#020509",
   "theme_color": "#020509",

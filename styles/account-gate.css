@@ -1,6 +1,7 @@
-.label-account-gate{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:24px;background:rgba(1,4,8,.8);backdrop-filter:blur(12px);animation:account-gate-in .22s ease both}
+.has-account-gate{overflow:hidden}
+.label-account-gate{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;overflow-y:auto;padding:16px;background:rgba(1,4,8,.8);backdrop-filter:blur(12px);overscroll-behavior:contain;animation:account-gate-in .22s ease both}
 .label-account-gate[hidden]{display:none}
-.label-account-gate-card{position:relative;width:min(510px,100%);padding:clamp(30px,6vw,54px);border:1px solid #62b2ff;background:radial-gradient(circle at 100% 0,rgba(98,178,255,.18),transparent 42%),linear-gradient(145deg,rgba(12,29,46,.98),rgba(4,9,15,.99));box-shadow:0 30px 110px rgba(0,0,0,.75),0 0 44px rgba(98,178,255,.12);text-align:center}
+.label-account-gate-card{position:relative;width:min(510px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;padding:clamp(30px,6vw,54px);border:1px solid #62b2ff;background:radial-gradient(circle at 100% 0,rgba(98,178,255,.18),transparent 42%),linear-gradient(145deg,rgba(12,29,46,.98),rgba(4,9,15,.99));box-shadow:0 30px 110px rgba(0,0,0,.75),0 0 44px rgba(98,178,255,.12);text-align:center}
 .label-account-gate-close{position:absolute;top:13px;right:15px;width:30px;height:30px;color:#8da0b0;background:transparent;border:1px solid transparent;font:15px 'Space Mono',monospace;cursor:pointer}
 .label-account-gate-close:hover{color:#fff;border-color:#29465d}
 .label-account-gate-kicker{margin:0;color:#62b2ff;font:10px 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase}

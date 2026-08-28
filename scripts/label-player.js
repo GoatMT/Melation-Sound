@@ -5,11 +5,11 @@
   var privateReleasePage = document.body.classList.contains('private-single-page');
   var privateReleaseLocked = privateReleasePage && document.body.classList.contains('private-locked');
   var tracks = privateReleasePage
-    ? [{ id:'10-20', name: '10:20', artist: 'MT', src: 'MT - 1020.MP3', art: '1020.png', page: 'song.html?track=10-20', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' }]
+    ? [{ id:'10-20', name: '10:20', artist: 'MT', src: 'singles/10-20/assets/MT - 1020.MP3', art: 'singles/10-20/assets/1020.png', page: 'songs/song.html?track=10-20', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' }]
     : [
-        { id:'01', name: 'A Dreams A Mystery', artist: 'Osama, MT', src: 'a-dreams-a-mystery.mp3', art: 'album-cover.png', page: 'song.html?track=01' },
-        { id:'02', name: 'Nightmare Fuel', artist: 'Osama, MT and Adam', src: 'Nightmare Fuel.MP3', art: 'Nightmare Fuel.png', page: 'song.html?track=02' },
-        { id:'11', name: "Nawaf's Stole Pain", artist: 'Bassam', src: "Nawaf's Stole Pain.MP3", art: "Nawaf's Stole Pain.png", page: 'song.html?track=11', exclusive: true }
+        { id:'01', name: 'A Dreams A Mystery', artist: 'Osama, MT', src: 'albums/a-broken-dream/assets/a-dreams-a-mystery.mp3', art: 'albums/a-broken-dream/assets/album-cover.png', page: 'songs/song.html?track=01' },
+        { id:'02', name: 'Nightmare Fuel', artist: 'Osama, MT and Adam', src: 'albums/a-broken-dream/assets/Nightmare Fuel.MP3', art: 'albums/a-broken-dream/assets/Nightmare Fuel.png', page: 'songs/song.html?track=02' },
+        { id:'11', name: "Nawaf's Stole Pain", artist: 'Bassam', src: "albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", art: "albums/a-broken-dream/assets/Nawaf's Stole Pain.png", page: 'songs/song.html?track=11', exclusive: true }
       ];
   var PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   var PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
@@ -23,7 +23,7 @@
   for (var i = 0; i < 64; i++) bars += '<i style="--bar-delay:' + (i % 9) * 0.08 + 's;--bar-height:' + (8 + ((i * 17) % 20)) + '%"></i>';
   mount.innerHTML = '<div class="label-player" id="labelPlayer" role="region" aria-label="Melation Sound audio player">' +
     '<div class="label-player-inner">' +
-      '<div class="label-player-track"><img src="album-cover.png" alt="" id="labelPlayerArt"><div><p id="labelPlayerName">Choose a track</p><p id="labelPlayerArtist">Melation Sound</p></div><a class="label-player-expand" id="labelPlayerExpand" href="song.html?track=01" aria-label="Open current song page" title="Open current song page" hidden>' + EXPAND + '</a></div>' +
+      '<div class="label-player-track"><img src="albums/a-broken-dream/assets/album-cover.png" alt="" id="labelPlayerArt"><div><p id="labelPlayerName">Choose a track</p><p id="labelPlayerArtist">Melation Sound</p></div><a class="label-player-expand" id="labelPlayerExpand" href="songs/song.html?track=01" aria-label="Open current song page" title="Open current song page" hidden>' + EXPAND + '</a></div>' +
       '<div class="label-player-controls"><div class="label-player-buttons">' +
         '<button type="button" class="label-player-btn" id="labelPlayerPrev" aria-label="Previous track">' + PREV + '</button>' +
         '<button type="button" class="label-player-btn label-player-play" id="labelPlayerPlay" aria-label="Play" disabled>' + PLAY + '</button>' +
@@ -170,7 +170,7 @@
     current.textContent = '0:00';
     duration.textContent = '0:00';
     player.classList.toggle('is-exclusive', !!track.exclusive);
-    expand.href = track.page || ('song.html?track=' + encodeURIComponent(track.id));
+    expand.href = track.page || ('songs/song.html?track=' + encodeURIComponent(track.id));
     expand.hidden = false;
     expand.setAttribute('aria-label', 'Open ' + track.name + ' song page');
     expand.setAttribute('title', 'Open ' + track.name + ' song page');

@@ -1,8 +1,8 @@
 export const catalog = [
-  { id:'01', title:'A Dreams A Mystery', artist:'Osama, MT', art:'album-cover.png', src:'a-dreams-a-mystery.mp3', href:'song.html?track=01', seconds:20 },
-  { id:'02', title:'Nightmare Fuel', artist:'Osama, MT and Adam', art:'Nightmare Fuel.png', src:'Nightmare Fuel.MP3', href:'song.html?track=02', seconds:37 },
-  { id:'11', title:"Nawaf's Stole Pain", artist:'Bassam', art:"Nawaf's Stole Pain.png", src:"Nawaf's Stole Pain.MP3", href:'song.html?track=11', seconds:87 },
-  { id:'10-20', title:'10:20', artist:'MT', art:'1020.png', src:'MT - 1020.MP3', href:'song.html?track=10-20', seconds:163 }
+  { id:'01', title:'A Dreams A Mystery', artist:'Osama, MT', art:'albums/a-broken-dream/assets/album-cover.png', src:'albums/a-broken-dream/assets/a-dreams-a-mystery.mp3', href:'songs/song.html?track=01', seconds:20 },
+  { id:'02', title:'Nightmare Fuel', artist:'Osama, MT and Adam', art:'albums/a-broken-dream/assets/Nightmare Fuel.png', src:'albums/a-broken-dream/assets/Nightmare Fuel.MP3', href:'songs/song.html?track=02', seconds:37 },
+  { id:'11', title:"Nawaf's Stole Pain", artist:'Bassam', art:"albums/a-broken-dream/assets/Nawaf's Stole Pain.png", src:"albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", href:'songs/song.html?track=11', seconds:87 },
+  { id:'10-20', title:'10:20', artist:'MT', art:'singles/10-20/assets/1020.png', src:'singles/10-20/assets/MT - 1020.MP3', href:'songs/song.html?track=10-20', seconds:163 }
 ];
 export const byId = Object.fromEntries(catalog.map(item => [item.id, item]));
 export function formatDuration(seconds) { const value = Math.max(0, Math.round(Number(seconds) || 0)); const hours = Math.floor(value / 3600); const minutes = Math.floor((value % 3600) / 60); return hours ? hours + 'h ' + minutes + 'm' : minutes + 'm ' + String(value % 60).padStart(2, '0') + 's'; }

@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="melation-sound.png">
-<link rel="apple-touch-icon" href="melation-sound.png">
-<link rel="manifest" href="site.webmanifest">
+<base href="../">
+<link rel="icon" type="image/png" href="assets/melation-sound.png">
+<link rel="apple-touch-icon" href="assets/melation-sound.png">
+<link rel="manifest" href="assets/site.webmanifest">
 <meta name="theme-color" content="#020509">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Melation Sound">
@@ -15,14 +16,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
-<link rel="stylesheet" href="song.css">
-<link rel="stylesheet" href="song-community.css?v=20260827-1">
-<link rel="stylesheet" href="site-motion.css?v=20260827-6"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-2"></head>
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/label.css"><link rel="stylesheet" href="styles/account-gate.css?v=20260827-1">
+<link rel="stylesheet" href="styles/song.css">
+<link rel="stylesheet" href="styles/song-community.css?v=20260827-1">
+<link rel="stylesheet" href="styles/site-motion.css?v=20260827-6"><link rel="stylesheet" href="styles/site-search.css?v=20260827-1"><link rel="stylesheet" href="styles/playlist.css?v=20260827-2"></head>
 <body class="song-page label-page">
 <header class="label-header"><nav class="label-nav wrap" aria-label="Main navigation">
-  <a class="label-brand" href="index.html" aria-label="Melation Sound home"><img src="melation-sound.png" alt="Melation Sound M logo"><span class="label-brand-name">MELATION <span>SOUND</span></span></a>
+  <a class="label-brand" href="index.html" aria-label="Melation Sound home"><img src="assets/melation-sound.png" alt="Melation Sound M logo"><span class="label-brand-name">MELATION <span>SOUND</span></span></a>
   <div class="label-links"><a href="index.html#catalog" aria-current="page">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Account</a><a href="about.html">About</a></div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
   <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
   <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
@@ -37,7 +38,7 @@
       <h1 id="songTitle">Loading song</h1>
       <p class="song-artist" id="songArtist">Melation Sound</p>
       <p class="song-release" id="songRelease">A Broken Dream</p>
-      <div class="song-heading-actions"><a id="songBack" href="album.html">Back to release</a><button type="button" id="songPlayTop">Play song</button><button type="button" id="songPlaylistAdd">Add to playlist</button></div>
+      <div class="song-heading-actions"><a id="songBack" href="albums/a-broken-dream/index.html">Back to release</a><button type="button" id="songPlayTop">Play song</button><button type="button" id="songPlaylistAdd">Add to playlist</button></div>
       <div class="song-engagement" aria-label="Song listener activity">
         <div class="song-engagement-stats"><span><strong id="songViewCount">0</strong> views</span><span><strong id="songLikeCount">0</strong> likes</span><span><strong id="songDislikeCount">0</strong> dislikes</span></div>
         <div class="song-reaction-actions"><button type="button" id="songLike" aria-pressed="false" aria-label="Like this song">Like</button><button type="button" id="songDislike" aria-pressed="false" aria-label="Dislike this song">Dislike</button><a href="charts.html">View charts →</a></div>
@@ -46,7 +47,7 @@
     <div class="song-disc-column">
       <div class="song-disc" id="songDisc" aria-label="Song record artwork">
         <span class="song-disc-groove groove-one"></span><span class="song-disc-groove groove-two"></span><span class="song-disc-groove groove-three"></span>
-        <div class="song-disc-art"><img id="songArt" src="album-cover.png" alt=""></div><span class="song-disc-hole"></span>
+        <div class="song-disc-art"><img id="songArt" src="albums/a-broken-dream/assets/album-cover.png" alt=""></div><span class="song-disc-hole"></span>
       </div>
       <p class="song-disc-caption">Now playing · Melation Sound</p>
     </div>
@@ -74,10 +75,10 @@
   </div>
 </section>
 <div id="label-player-mount" data-label-start="0"></div>
-<script src="engagement.js"></script>
-<script src="song-page.js?v=20260827-2"></script>
-<script src="label-player.js?v=20260827-3"></script>
-<script src="firebase-config.js?v=20260827-2"></script>
-<script type="module" src="community.js?v=20260827-4"></script>
-<script src="site-search.js?v=20260827-3"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
+<script src="scripts/engagement.js"></script>
+<script src="scripts/song-page.js?v=20260827-2"></script>
+<script src="scripts/label-player.js?v=20260827-3"></script>
+<script src="config/firebase-config.js?v=20260827-2"></script>
+<script type="module" src="scripts/community.js?v=20260827-4"></script>
+<script src="scripts/site-search.js?v=20260827-3"></script><script type="module" src="scripts/community-features.js?v=20260827-1"></script></body>
 </html>

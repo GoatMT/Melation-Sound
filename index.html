@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="melation-sound.png">
-<link rel="apple-touch-icon" href="melation-sound.png">
-<link rel="manifest" href="site.webmanifest">
+<link rel="icon" type="image/png" href="assets/melation-sound.png">
+<link rel="apple-touch-icon" href="assets/melation-sound.png">
+<link rel="manifest" href="assets/site.webmanifest">
 <meta name="theme-color" content="#020509">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Melation Sound">
@@ -15,15 +15,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
-<link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
-<link rel="stylesheet" href="site-motion.css?v=20260827-6">
-<link rel="preload" as="image" href="album-cover.png"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-2"></head>
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/label.css"><link rel="stylesheet" href="styles/account-gate.css?v=20260827-1">
+<link rel="stylesheet" href="styles/site-motion.css?v=20260827-6">
+<link rel="preload" as="image" href="albums/a-broken-dream/assets/album-cover.png"><link rel="stylesheet" href="styles/site-search.css?v=20260827-1"><link rel="stylesheet" href="styles/playlist.css?v=20260827-2"></head>
 <body class="label-page label-home">
 <header class="label-header">
   <nav class="label-nav wrap" aria-label="Main navigation">
     <a class="label-brand" href="index.html" aria-label="Melation Sound home">
-      <img src="melation-sound.png" alt="Melation Sound M logo">
+      <img src="assets/melation-sound.png" alt="Melation Sound M logo">
       <span class="label-brand-name">MELATION <span>SOUND</span></span>
     </a>
     <div class="label-links">
@@ -49,7 +49,7 @@
         <h1 class="label-title">Melation<br><span>Sound</span></h1>
         <p class="label-copy">A home for dark ideas, loud voices, and music made to stay with you. Explore the catalog and enter each album's world.</p>
       </div>
-      <img class="label-logo-large" src="melation-sound.png" alt="Blue glowing Melation Sound M logo">
+      <img class="label-logo-large" src="assets/melation-sound.png" alt="Blue glowing Melation Sound M logo">
     </section>
     <section class="label-section" id="catalog" aria-labelledby="catalog-title">
       <div class="label-section-head">
@@ -57,15 +57,15 @@
         <span class="label-section-meta">01 album · 01 single</span>
       </div>
       <div class="album-grid">
-        <a class="album-card" href="album.html" aria-label="Open A Broken Dream album site">
-          <div class="album-card-art"><img src="album-cover.png" alt="A Broken Dream album cover by Osama, MT" loading="eager" fetchpriority="high"></div>
+        <a class="album-card" href="albums/a-broken-dream/index.html" aria-label="Open A Broken Dream album site">
+          <div class="album-card-art"><img src="albums/a-broken-dream/assets/album-cover.png" alt="A Broken Dream album cover by Osama, MT" loading="eager" fetchpriority="high"></div>
           <p class="album-card-label">Featured release · 2026</p>
           <h2>A Broken Dream</h2>
           <p>Osama, MT · 10 tracks + bonus</p>
           <span class="album-card-enter">Enter album</span>
         </a>
-        <a class="album-card single-catalog-card" href="1020.html" aria-label="Open 10:20 single by MT">
-          <div class="album-card-art"><img src="1020.png" alt="10:20 single artwork by MT" loading="lazy"></div>
+        <a class="album-card single-catalog-card" href="singles/10-20/index.html" aria-label="Open 10:20 single by MT">
+          <div class="album-card-art"><img src="singles/10-20/assets/1020.png" alt="10:20 single artwork by MT" loading="lazy"></div>
           <p class="album-card-label">Single release · Aug 24, 2026</p>
           <h2>10:20</h2>
           <p>MT · 1 track</p>
@@ -93,6 +93,6 @@
 </main>
 <footer class="label-footer"><div class="wrap"><div class="label-footer-row"><span>Melation Sound</span><div class="footer-utility-links"><a href="profile.html">Profile</a><a href="playlist.html">Playlist</a><a href="achievements.html">Achievements</a><a href="updates.html">Updates</a><a href="admin.html">Admin</a></div></div><p class="label-footer-note">© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
 <div id="label-player-mount"></div>
-<script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-4"></script><script src="label-player.js?v=20260827-3"></script>
-<script src="site-search.js?v=20260827-3"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
+<script src="config/firebase-config.js?v=20260827-2"></script><script type="module" src="scripts/community.js?v=20260827-4"></script><script src="scripts/label-player.js?v=20260827-3"></script>
+<script src="scripts/site-search.js?v=20260827-3"></script><script type="module" src="scripts/community-features.js?v=20260827-1"></script></body>
 </html>

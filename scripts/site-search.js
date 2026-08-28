@@ -7,11 +7,11 @@
   if (!input || !results) return;
 
   var catalog = [
-    { title: 'A Broken Dream', meta: 'Album · Osama, MT', action: 'Open album', href: 'album.html', terms: 'a broken dream album osama mt' },
-    { title: '10:20', meta: 'Single · MT', action: 'Open single', href: '1020.html', terms: '10 20 1020 single mt' },
-    { title: 'A Dreams A Mystery', meta: 'Song · Osama, MT · A Broken Dream', action: 'Open song page', href: 'song.html?track=01', terms: 'a dreams a mystery song osama mt' },
-    { title: 'Nightmare Fuel', meta: 'Song · Osama, MT and Adam · A Broken Dream', action: 'Open song page', href: 'song.html?track=02', terms: 'nightmare fuel song osama mt adam' },
-    { title: "Nawaf's Stole Pain", meta: 'Bonus track · Bassam · A Broken Dream', action: 'Open song page', href: 'song.html?track=11', terms: 'nawaf stole pain bassam bonus track' },
+    { title: 'A Broken Dream', meta: 'Album · Osama, MT', action: 'Open album', href: 'albums/a-broken-dream/index.html', terms: 'a broken dream album osama mt' },
+    { title: '10:20', meta: 'Single · MT', action: 'Open single', href: 'singles/10-20/index.html', terms: '10 20 1020 single mt' },
+    { title: 'A Dreams A Mystery', meta: 'Song · Osama, MT · A Broken Dream', action: 'Open song page', href: 'songs/song.html?track=01', terms: 'a dreams a mystery song osama mt' },
+    { title: 'Nightmare Fuel', meta: 'Song · Osama, MT and Adam · A Broken Dream', action: 'Open song page', href: 'songs/song.html?track=02', terms: 'nightmare fuel song osama mt adam' },
+    { title: "Nawaf's Stole Pain", meta: 'Bonus track · Bassam · A Broken Dream', action: 'Open song page', href: 'songs/song.html?track=11', terms: 'nawaf stole pain bassam bonus track' },
     { title: 'Artists', meta: 'Melation Sound · featured artists', action: 'Browse artists', href: 'artists.html', terms: 'artists artist osama mt adam bassam' },
     { title: 'Timeline', meta: 'Melation Sound · release archive', action: 'View timeline', href: 'timeline.html', terms: 'timeline releases dates' },
     { title: 'Charts', meta: 'Melation Sound · listeners and songs', action: 'View charts', href: 'charts.html', terms: 'charts views likes dislikes listeners' },

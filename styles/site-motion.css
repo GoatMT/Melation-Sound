@@ -150,7 +150,6 @@ body > header,
   transform: translateY(-2px);
 }
 
-.label-player.open,
 .player-bar.open {
   animation: melation-player-in .46s cubic-bezier(.22,.8,.3,1) both;
 }
