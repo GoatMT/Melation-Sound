@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
-</head>
+<link rel="stylesheet" href="site-motion.css?v=20260827-5"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-1"></head>
 <body>
 <header class="site-header">
   <nav class="site-nav wrap" aria-label="Main navigation">
@@ -25,11 +25,16 @@
       <span class="brand-name">A BROKEN <b>DREAM</b></span>
     </a>
     <div class="nav-links">
+      <a href="album.html">Home</a>
+      <a href="index.html">Melation Sound</a>
       <a href="tracklist.html" aria-current="page">Tracklist</a>
       <a href="artist-bio.html">Artist Bio</a>
-      <a href="charts.html">Charts</a>
-      <a href="community.html">Account</a>
-    </div>
+    </div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
+  <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
+  <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
+  <button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
+  <div class="site-search-results" id="siteSearchResults" role="listbox"></div>
+</form>
   </nav>
 </header>
 <main class="page-main">
@@ -56,5 +61,5 @@
   </div>
 </main>
 <footer class="site-footer"><div class="wrap"><div class="footer-row"><span>Osama, MT and Adam</span><div class="footer-links"><a href="tracklist.html" aria-current="page">Tracklist</a><a href="artist-bio.html">Artist Bio</a></div></div><p class="footer-note">Parental Advisory — Explicit Content.</p></div></footer>
-</body>
+<script src="site-search.js?v=20260827-1"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
 </html>

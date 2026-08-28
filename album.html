@@ -141,7 +141,7 @@
   .brand-name b{ color:var(--toxic); font-weight:400; }
 
   .nav-links{
-    display:flex; align-items:center; gap:18px;
+    display:flex; align-items:center; justify-content:flex-end; gap:18px;
     font-family:'Space Mono', monospace;
     font-size:13px;
     letter-spacing:.12em;
@@ -1030,13 +1030,13 @@
     *{ transition:none !important; }
   }
 </style>
-</head>
+<link rel="stylesheet" href="site-motion.css?v=20260827-5"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-1"></head>
 <body class="release-page album-release-page">
 
 <!-- =============== NAV =============== -->
 <header class="site-header">
   <nav class="wrap site-nav" aria-label="Main navigation">
-    <a class="brand" href="index.html" aria-label="Melation Sound home">
+    <a class="brand" href="album.html" aria-label="A Broken Dream home">
       <span class="mark" aria-hidden="true">
         <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
           <circle cx="20" cy="20" r="18" stroke="#8CFF3E" stroke-width="2"/>
@@ -1050,11 +1050,16 @@
       <span class="brand-name">A BROKEN <b>DREAM</b></span>
     </a>
     <div class="nav-links" aria-label="Main navigation">
+      <a href="album.html" aria-current="page">Home</a>
       <a href="index.html">Melation Sound</a>
       <a href="tracklist.html">Tracklist</a>
       <a href="artist-bio.html">Artist Bio</a>
-      <a href="charts.html">Charts</a>
-    </div>
+    </div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
+  <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
+  <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
+  <button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
+  <div class="site-search-results" id="siteSearchResults" role="listbox"></div>
+</form>
   </nav>
 </header>
 
@@ -1617,7 +1622,7 @@
   }
 
 </script>
-<script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="label-player.js?v=20260827-2"></script>
+<script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="label-player.js?v=20260827-3"></script>
 
-</body>
+<script src="site-search.js?v=20260827-1"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
 </html>

@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
 <link rel="stylesheet" href="release.css">
-</head>
+<link rel="stylesheet" href="site-motion.css?v=20260827-5"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-1"></head>
 <body class="release-page single-release-page private-single-page private-locked">
 <section class="private-gate" id="privateGate" aria-labelledby="privateGateTitle">
   <div class="private-gate-card">
@@ -66,7 +66,12 @@
 </script>
 <header class="site-header"><nav class="wrap site-nav" aria-label="Main navigation">
   <a class="brand" href="index.html" aria-label="Melation Sound home"><span class="mark" aria-hidden="true"><img src="melation-sound.png" alt="" width="38" height="38"></span><span class="brand-name">MELATION <b>SOUND</b></span></a>
-  <div class="nav-links" aria-label="Main navigation"><a href="index.html">Melation Sound</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a></div>
+  <div class="nav-links" aria-label="Main navigation"><a href="index.html">Melation Sound</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a></div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
+  <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
+  <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
+  <button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
+  <div class="site-search-results" id="siteSearchResults" role="listbox"></div>
+</form>
 </nav></header>
 <main class="release-main">
   <section class="hero release-hero"><div class="hero-grid">
@@ -91,6 +96,6 @@
   <div class="release-banner"><p class="release-banner-text">10:20 · MT</p></div>
 </main>
 <footer class="release-footer"><div class="wrap"><div class="release-footer-row"><span>MT · 10:20</span><div class="release-footer-links"><a href="index.html">Melation Sound</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a></div></div><p class="release-footer-note">© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
-<div id="label-player-mount" data-label-start="0"></div><script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="label-player.js?v=20260827-2"></script>
-</body>
+<div id="label-player-mount" data-label-start="0"></div><script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="label-player.js?v=20260827-3"></script>
+<script src="site-search.js?v=20260827-1"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
 </html>

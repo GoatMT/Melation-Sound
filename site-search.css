@@ -1,0 +1,117 @@
+/* Shared catalog search for every Melation Sound page. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.site-search {
+  position: relative;
+  z-index: 220;
+  flex: 0 1 220px;
+  min-width: 170px;
+}
+
+.site-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 40px 11px 13px;
+  color: #eef6ff;
+  background: rgba(7, 16, 25, .9);
+  border: 1px solid #28445e;
+  border-radius: 2px;
+  outline: none;
+  font: 11px 'Space Mono', monospace;
+  letter-spacing: .04em;
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+.site-search input::placeholder { color: #728ba1; }
+.site-search input:focus {
+  border-color: #62b2ff;
+  background: #071522;
+  box-shadow: 0 0 0 3px rgba(98,178,255,.12), 0 0 20px rgba(22,135,255,.12);
+}
+
+.site-search button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: #8eb7d9;
+  background: transparent;
+  border: 0;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.site-search button svg { width: 16px; height: 16px; }
+.site-search button:hover,
+.site-search button:focus-visible { color: #fff; }
+
+.site-search-results {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  display: none;
+  width: min(360px, calc(100vw - 32px));
+  max-height: min(420px, calc(100vh - 130px));
+  overflow: auto;
+  padding: 7px;
+  background: rgba(4, 12, 20, .98);
+  border: 1px solid #286aa4;
+  box-shadow: 0 18px 50px rgba(0,0,0,.52), 0 0 25px rgba(22,135,255,.12);
+}
+
+.site-search.is-open .site-search-results { display: grid; gap: 4px; }
+.site-search-empty { margin: 0; padding: 12px; color: #8a9caf; font: 10px/1.6 'Space Mono', monospace; }
+.site-search-result {
+  display: block;
+  padding: 12px 13px;
+  color: #eef6ff;
+  text-decoration: none;
+  border: 1px solid transparent;
+  background: #071522;
+  transition: border-color .18s ease, background-color .18s ease, transform .18s ease;
+}
+.site-search-result:hover,
+.site-search-result:focus-visible {
+  border-color: #62b2ff;
+  background: #0a1b2d;
+  transform: translateX(3px);
+}
+.site-search-result strong { display: block; font: 20px 'Bebas Neue', sans-serif; letter-spacing: .05em; }
+.site-search-result small { display: block; margin-top: 3px; color: #8a9caf; font: 9px 'Space Mono', monospace; letter-spacing: .06em; text-transform: uppercase; }
+.site-search-result em { display: block; margin-top: 7px; color: #62b2ff; font: 9px 'Space Mono', monospace; font-style: normal; letter-spacing: .08em; text-transform: uppercase; }
+
+body:not(.label-page) .site-search input:focus { border-color: var(--toxic); box-shadow: 0 0 0 3px rgba(140,255,62,.1); }
+body:not(.label-page) .site-search button:hover,
+body:not(.label-page) .site-search button:focus-visible { color: var(--toxic); }
+body:not(.label-page) .site-search-results { border-color: var(--toxic-dim); }
+body:not(.label-page) .site-search-result:hover,
+body:not(.label-page) .site-search-result:focus-visible { border-color: var(--toxic); }
+body:not(.label-page) .site-search-result em { color: var(--toxic); }
+
+@media (max-width: 1100px) {
+  .site-search { flex-basis: 180px; }
+  .label-nav, .site-nav { gap: 14px; }
+  .label-links { gap: 5px; }
+  .label-links a { padding-left: 10px; padding-right: 10px; }
+}
+
+@media (max-width: 700px) {
+  .site-search { width: 100%; flex: 0 0 100%; order: 4; }
+  .label-nav .site-search, .site-nav .site-search { margin-top: 4px; }
+  .site-search-results { left: 0; right: auto; width: min(100%, 360px); }
+}

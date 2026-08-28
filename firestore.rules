@@ -16,7 +16,7 @@ service cloud.firestore {
           "username", "usernameKey", "displayName", "pinHash", "createdAtMs"
         ]);
         allow update: if request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(["displayName", "totalSeconds", "uniqueSongs", "plays", "updatedAtMs"]);
+          .hasOnly(["displayName", "totalSeconds", "uniqueSongs", "plays", "playlist", "updatedAtMs"]);
         allow delete: if false;
 
         match /listens/{songId} {

@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
-</head>
+<link rel="stylesheet" href="site-motion.css?v=20260827-5"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-1"></head>
 <body class="label-page">
 <header class="label-header">
   <nav class="label-nav wrap" aria-label="Main navigation">
@@ -32,7 +32,12 @@
       <a href="charts.html">Charts</a>
       <a href="community.html">Account</a>
       <a href="about.html">About</a>
-    </div>
+    </div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
+  <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
+  <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
+  <button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
+  <div class="site-search-results" id="siteSearchResults" role="listbox"></div>
+</form>
   </nav>
 </header>
 <main class="label-main">
@@ -43,9 +48,9 @@
           <p class="label-kicker">Melation Sound · featured artists</p>
           <h1 class="label-section-title" id="artist-page-title">Artists</h1>
         </div>
-        <span class="label-section-meta">01 album · 04 artists</span>
+        <span class="label-section-meta">01 album · 01 single · 04 artists</span>
       </div>
-      <p class="label-copy">Browse the artists featured across the current Melation Sound catalog. Open an album to reveal its contributors, then open an artist to read their profile.</p>
+      <p class="label-copy">Browse the artists featured across the current Melation Sound catalog. Open an album or single to reveal its contributors, then open an artist to read their profile.</p>
       <div class="artist-album-list">
         <details class="artist-album">
           <summary><span>A Broken Dream<span class="artist-album-meta">10 tracks + bonus · 4 artists</span></span></summary>
@@ -68,12 +73,21 @@
             </details>
           </div>
         </details>
+        <details class="artist-album">
+          <summary><span>10:20<span class="artist-album-meta">Single · 1 artist</span></span></summary>
+          <div class="artist-grid">
+            <details class="artist-entry">
+              <summary>MT</summary>
+              <p>MT is the artist behind the private Melation Sound single “10:20.” <a href="artist-mt.html">View profile →</a> <a href="1020.html">Open single →</a></p>
+            </details>
+          </div>
+        </details>
       </div>
     </section>
   </div>
 </main>
 <footer class="label-footer"><div class="wrap"><div class="label-footer-row"><span>Melation Sound</span><div class="label-footer-links"><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html" aria-current="page">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="about.html">About</a></div></div><p class="label-footer-note">© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
 <div id="label-player-mount"></div>
-<script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="label-player.js?v=20260827-2"></script>
-</body>
+<script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="label-player.js?v=20260827-3"></script>
+<script src="site-search.js?v=20260827-1"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
 </html>

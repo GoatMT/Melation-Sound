@@ -69,6 +69,8 @@ nav.site-nav{
   letter-spacing:.08em;
 }
 .brand-name b{color:var(--toxic);font-weight:400}
+.brand[aria-current="page"] .brand-name{color:var(--toxic)}
+.brand[aria-current="page"] .mark{filter:drop-shadow(0 0 8px rgba(140,255,62,.28))}
 .nav-links{
   display:flex;
   align-items:center;

@@ -18,11 +18,16 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
 <link rel="stylesheet" href="charts.css?v=20260827-1">
-</head>
+<link rel="stylesheet" href="site-motion.css?v=20260827-5"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-1"></head>
 <body class="label-page charts-page">
 <header class="label-header"><nav class="label-nav wrap" aria-label="Main navigation">
   <a class="label-brand" href="index.html" aria-label="Melation Sound home"><img src="melation-sound.png" alt="Melation Sound M logo"><span class="label-brand-name">MELATION <span>SOUND</span></span></a>
-  <div class="label-links"><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html" aria-current="page">Charts</a><a href="community.html">Account</a><a href="about.html">About</a></div>
+  <div class="label-links"><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html" aria-current="page">Charts</a><a href="community.html">Account</a><a href="about.html">About</a></div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
+  <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
+  <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
+  <button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
+  <div class="site-search-results" id="siteSearchResults" role="listbox"></div>
+</form>
 </nav></header>
 <main class="label-main"><div class="wrap label-subpage">
   <p class="label-kicker">Melation Sound · listener activity</p>
@@ -38,6 +43,6 @@
   <section class="charts-how"><div><p class="label-kicker">How it works</p><h2>Make your mark.</h2></div><div class="charts-how-copy"><p>Open a song page to play the track and use the Like or Dislike buttons. You can change your reaction at any time, and each song page records one view per browser session.</p><a href="index.html#catalog">Browse the catalog →</a></div></section>
 </div></main>
 <footer class="label-footer"><div class="wrap"><div class="label-footer-row"><span>Melation Sound</span><div class="label-footer-links"><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html" aria-current="page">Charts</a><a href="about.html">About</a></div></div><p class="label-footer-note">© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
-<div id="label-player-mount"></div><script src="engagement.js"></script><script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="charts.js"></script><script src="label-player.js?v=20260827-2"></script>
-</body>
+<div id="label-player-mount"></div><script src="engagement.js"></script><script src="firebase-config.js?v=20260827-2"></script><script type="module" src="community.js?v=20260827-2"></script><script src="charts.js"></script><script src="label-player.js?v=20260827-3"></script>
+<script src="site-search.js?v=20260827-1"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
 </html>

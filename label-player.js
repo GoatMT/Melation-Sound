@@ -5,16 +5,17 @@
   var privateReleasePage = document.body.classList.contains('private-single-page');
   var privateReleaseLocked = privateReleasePage && document.body.classList.contains('private-locked');
   var tracks = privateReleasePage
-    ? [{ id:'10-20', name: '10:20', artist: 'MT', src: 'MT - 1020.MP3', art: '1020.png', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' }]
+    ? [{ id:'10-20', name: '10:20', artist: 'MT', src: 'MT - 1020.MP3', art: '1020.png', page: 'song.html?track=10-20', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' }]
     : [
-        { id:'01', name: 'A Dreams A Mystery', artist: 'Osama, MT', src: 'a-dreams-a-mystery.mp3', art: 'album-cover.png' },
-        { id:'02', name: 'Nightmare Fuel', artist: 'Osama, MT and Adam', src: 'Nightmare Fuel.MP3', art: 'Nightmare Fuel.png' },
-        { id:'11', name: "Nawaf's Stole Pain", artist: 'Bassam', src: "Nawaf's Stole Pain.MP3", art: "Nawaf's Stole Pain.png", exclusive: true }
+        { id:'01', name: 'A Dreams A Mystery', artist: 'Osama, MT', src: 'a-dreams-a-mystery.mp3', art: 'album-cover.png', page: 'song.html?track=01' },
+        { id:'02', name: 'Nightmare Fuel', artist: 'Osama, MT and Adam', src: 'Nightmare Fuel.MP3', art: 'Nightmare Fuel.png', page: 'song.html?track=02' },
+        { id:'11', name: "Nawaf's Stole Pain", artist: 'Bassam', src: "Nawaf's Stole Pain.MP3", art: "Nawaf's Stole Pain.png", page: 'song.html?track=11', exclusive: true }
       ];
   var PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   var PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
   var PREV = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 6L9 12l11 6z"/></svg>';
   var NEXT = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM4 6l11 6-11 6z"/></svg>';
+  var EXPAND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M3 3l7 7M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7M16 21h5v-5M21 21l-7-7"/></svg>';
   var VOL = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.2 9.5a4 4 0 010 5M18.5 7a7.5 7.5 0 010 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>';
   var MUTE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>';
 
@@ -22,7 +23,7 @@
   for (var i = 0; i < 64; i++) bars += '<i style="--bar-delay:' + (i % 9) * 0.08 + 's;--bar-height:' + (8 + ((i * 17) % 20)) + '%"></i>';
   mount.innerHTML = '<div class="label-player" id="labelPlayer" role="region" aria-label="Melation Sound audio player">' +
     '<div class="label-player-inner">' +
-      '<div class="label-player-track"><img src="album-cover.png" alt="" id="labelPlayerArt"><div><p id="labelPlayerName">Choose a track</p><p id="labelPlayerArtist">Melation Sound</p></div></div>' +
+      '<div class="label-player-track"><img src="album-cover.png" alt="" id="labelPlayerArt"><div><p id="labelPlayerName">Choose a track</p><p id="labelPlayerArtist">Melation Sound</p></div><a class="label-player-expand" id="labelPlayerExpand" href="song.html?track=01" aria-label="Open current song page" title="Open current song page" hidden>' + EXPAND + '</a></div>' +
       '<div class="label-player-controls"><div class="label-player-buttons">' +
         '<button type="button" class="label-player-btn" id="labelPlayerPrev" aria-label="Previous track">' + PREV + '</button>' +
         '<button type="button" class="label-player-btn label-player-play" id="labelPlayerPlay" aria-label="Play" disabled>' + PLAY + '</button>' +
@@ -36,6 +37,7 @@
   var art = document.getElementById('labelPlayerArt');
   var name = document.getElementById('labelPlayerName');
   var artist = document.getElementById('labelPlayerArtist');
+  var expand = document.getElementById('labelPlayerExpand');
   var play = document.getElementById('labelPlayerPlay');
   var prev = document.getElementById('labelPlayerPrev');
   var next = document.getElementById('labelPlayerNext');
@@ -168,6 +170,10 @@
     current.textContent = '0:00';
     duration.textContent = '0:00';
     player.classList.toggle('is-exclusive', !!track.exclusive);
+    expand.href = track.page || ('song.html?track=' + encodeURIComponent(track.id));
+    expand.hidden = false;
+    expand.setAttribute('aria-label', 'Open ' + track.name + ' song page');
+    expand.setAttribute('title', 'Open ' + track.name + ' song page');
     player.classList.add('open');
     play.disabled = false;
     document.body.classList.add('has-label-player');

@@ -19,11 +19,16 @@
 <link rel="stylesheet" href="label.css"><link rel="stylesheet" href="account-gate.css?v=20260827-1">
 <link rel="stylesheet" href="song.css">
 <link rel="stylesheet" href="song-community.css?v=20260827-1">
-</head>
+<link rel="stylesheet" href="site-motion.css?v=20260827-5"><link rel="stylesheet" href="site-search.css?v=20260827-1"><link rel="stylesheet" href="playlist.css?v=20260827-1"></head>
 <body class="song-page label-page">
 <header class="label-header"><nav class="label-nav wrap" aria-label="Main navigation">
   <a class="label-brand" href="index.html" aria-label="Melation Sound home"><img src="melation-sound.png" alt="Melation Sound M logo"><span class="label-brand-name">MELATION <span>SOUND</span></span></a>
-  <div class="label-links"><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Account</a><a href="about.html">About</a></div>
+  <div class="label-links"><a href="index.html#catalog" aria-current="page">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Account</a><a href="about.html">About</a></div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
+  <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
+  <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
+  <button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
+  <div class="site-search-results" id="siteSearchResults" role="listbox"></div>
+</form>
 </nav></header>
 <main class="song-main">
   <section class="song-stage" aria-labelledby="songTitle">
@@ -32,7 +37,7 @@
       <h1 id="songTitle">Loading song</h1>
       <p class="song-artist" id="songArtist">Melation Sound</p>
       <p class="song-release" id="songRelease">A Broken Dream</p>
-      <div class="song-heading-actions"><a id="songBack" href="album.html">Back to release</a><button type="button" id="songPlayTop">Play song</button></div>
+      <div class="song-heading-actions"><a id="songBack" href="album.html">Back to release</a><button type="button" id="songPlayTop">Play song</button><button type="button" id="songPlaylistAdd">Add to playlist</button></div>
       <div class="song-engagement" aria-label="Song listener activity">
         <div class="song-engagement-stats"><span><strong id="songViewCount">0</strong> views</span><span><strong id="songLikeCount">0</strong> likes</span><span><strong id="songDislikeCount">0</strong> dislikes</span></div>
         <div class="song-reaction-actions"><button type="button" id="songLike" aria-pressed="false" aria-label="Like this song">Like</button><button type="button" id="songDislike" aria-pressed="false" aria-label="Dislike this song">Dislike</button><a href="charts.html">View charts →</a></div>
@@ -59,7 +64,7 @@
     <div class="song-community-body"><p class="song-comment-note" id="songCommentNote">Loading comments…</p><form class="song-comment-form" id="songCommentForm"><textarea id="songCommentText" maxlength="500" placeholder="Share your thoughts on this song…" aria-label="Write a comment"></textarea><button type="submit">Post comment</button></form><div class="song-comment-list" id="songCommentList"></div></div>
   </section>
 </main>
-<footer class="song-footer"><div class="wrap"><div class="song-footer-row"><span>Melation Sound</span><div class="song-footer-links"><a href="index.html">Home</a><a href="index.html#catalog">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Listeners</a></div></div><p>© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
+<footer class="song-footer"><div class="wrap"><div class="song-footer-row"><span>Melation Sound</span><div class="song-footer-links"><a href="index.html">Home</a><a href="index.html#catalog" aria-current="page">Albums &amp; Singles</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Listeners</a></div></div><p>© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
 <section class="private-gate" id="privateGate" hidden aria-labelledby="privateGateTitle">
   <div class="private-gate-card">
     <p class="private-gate-kicker">Melation Sound · private song</p><h1 id="privateGateTitle">10:20</h1>
@@ -71,8 +76,8 @@
 <div id="label-player-mount" data-label-start="0"></div>
 <script src="engagement.js"></script>
 <script src="song-page.js?v=20260827-1"></script>
-<script src="label-player.js?v=20260827-2"></script>
+<script src="label-player.js?v=20260827-3"></script>
 <script src="firebase-config.js?v=20260827-2"></script>
 <script type="module" src="community.js?v=20260827-2"></script>
-</body>
+<script src="site-search.js?v=20260827-1"></script><script type="module" src="community-features.js?v=20260827-1"></script></body>
 </html>

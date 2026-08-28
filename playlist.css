@@ -1,0 +1,55 @@
+.playlist-panel,
+.browse-playlists { margin-top: 22px; }
+.playlist-body { padding: 24px; }
+.playlist-note,
+.profile-playlist-meta { margin: 0 0 18px; color: var(--label-muted); font-size: 14px; line-height: 1.65; }
+.playlist-form { display: grid; gap: 8px; margin-bottom: 22px; }
+.playlist-form label { margin-top: 8px; color: var(--label-muted); font: 9px 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+.playlist-name-row,
+.playlist-add-row { display: flex; gap: 9px; }
+.playlist-form input,
+.playlist-form select { min-width: 0; flex: 1; box-sizing: border-box; padding: 11px 13px; color: #fff; background: #071019; border: 1px solid var(--label-line); font: 13px 'Archivo', sans-serif; outline: none; }
+.playlist-form select { appearance: auto; }
+.playlist-form input:focus,
+.playlist-form select:focus { border-color: var(--community-blue); }
+.playlist-form button,
+#songPlaylistAdd { padding: 11px 14px; color: #06111c; background: var(--community-blue, #62b2ff); border: 1px solid var(--community-blue, #62b2ff); font: 9px 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
+.playlist-form button:hover,
+#songPlaylistAdd:hover { color: #06111c; background: #d7edff; border-color: #d7edff; }
+.playlist-status { min-height: 16px; margin: 0; color: #9ed1ff; font: 10px 'Space Mono', monospace; line-height: 1.5; }
+.playlist-track-list,
+.playlist-browse-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.playlist-track-row,
+.playlist-browse-row { display: flex; align-items: center; gap: 13px; padding: 12px 14px; color: inherit; background: #071522; border: 1px solid rgba(98,178,255,.14); }
+.playlist-track-row img,
+.playlist-browse-art { width: 42px; height: 42px; flex: 0 0 42px; object-fit: cover; }
+.playlist-track-copy,
+.playlist-browse-copy { min-width: 0; flex: 1; }
+.playlist-track-copy strong,
+.playlist-track-copy small,
+.playlist-browse-copy strong,
+.playlist-browse-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.playlist-track-copy strong,
+.playlist-browse-copy strong { color: #fff; font: 19px 'Bebas Neue', sans-serif; letter-spacing: .05em; }
+.playlist-track-copy small,
+.playlist-browse-copy small { margin-top: 3px; color: var(--label-muted); font: 9px 'Space Mono', monospace; letter-spacing: .05em; text-transform: uppercase; }
+.playlist-track-duration,
+.playlist-browse-meta { color: var(--community-blue, #62b2ff); font: 10px 'Space Mono', monospace; text-align: right; white-space: nowrap; }
+.playlist-remove { padding: 4px 7px; color: #9db1c2; background: transparent; border: 1px solid rgba(157,177,194,.35); font: 9px 'Space Mono', monospace; cursor: pointer; }
+.playlist-remove:hover { color: #fff; border-color: #ff8585; background: rgba(255,107,107,.1); }
+.playlist-browse-row { text-decoration: none; transition: background-color .18s ease, border-color .18s ease, transform .18s ease; }
+.playlist-browse-row:hover,
+.playlist-browse-row:focus-visible { background: #0a1b2d; border-color: #62b2ff; transform: translateX(3px); }
+.playlist-browse-meta small { display: block; margin-top: 3px; color: var(--label-muted); font-size: 8px; text-transform: uppercase; }
+.profile-playlist-section { grid-column: 1 / -1; }
+.profile-playlist-section .profile-song-list:empty::after { content: 'No playlist songs yet.'; display: block; padding: 20px; color: var(--label-muted); font-size: 14px; }
+#songPlaylistAdd { align-self: center; }
+@media (max-width: 600px) {
+  .playlist-name-row,
+  .playlist-add-row { flex-direction: column; }
+  .playlist-form button,
+  #songPlaylistAdd { min-height: 42px; }
+  .playlist-track-row { align-items: flex-start; flex-wrap: wrap; }
+  .playlist-track-duration { margin-left: 55px; }
+  .playlist-remove { margin-left: auto; }
+}
