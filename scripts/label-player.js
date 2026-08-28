@@ -106,8 +106,10 @@
   function hasListenerAccount() {
     var service = window.MelationCommunity;
     var adminUnlocked = false;
+    var storedUser = null;
     try { adminUnlocked = sessionStorage.getItem('melationAdminUnlocked') === 'yes'; } catch (e) {}
-    return adminUnlocked || !!(service && typeof service.user === 'function' && service.user());
+    try { storedUser = JSON.parse(sessionStorage.getItem('melationSoundAccount') || 'null'); } catch (e) {}
+    return adminUnlocked || !!(service && typeof service.user === 'function' && service.user()) || !!storedUser?.usernameKey;
   }
   function closeAccountGate() {
     if (!accountGate) return;
@@ -138,6 +140,7 @@
     showAccountGate();
     return false;
   }
+  window.melationOpenAccountGate = showAccountGate;
 
   function escapeChatText(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (character) {

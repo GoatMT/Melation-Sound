@@ -30,6 +30,8 @@ let activePresenceRef = null;
 let presenceId = '';
 let lastPlaybackSignature = '';
 let lastPlaybackSyncMs = 0;
+let sharedRoomsReady = false;
+let sharedRoomsError = '';
 
 function escapeHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function readLocal() { try { const value = JSON.parse(localStorage.getItem('melationListeningRooms') || '[]'); return Array.isArray(value) ? value.filter(room => room && room.owner === 'local' && room.active !== false) : []; } catch (error) { return []; } }
@@ -48,8 +50,9 @@ function viewerEntries(room) { return Array.isArray(roomViewers[room.id]) ? room
 function viewerNames(room) { return viewerEntries(room).map(viewer => viewer.viewerName).filter(Boolean); }
 function livePayload(room) { return { id:room.id, name:room.name, viewerCount:Number(roomCounts[room.id]) || 0, viewers:viewerNames(room) }; }
 function syncLivePlayer(room) { if (window.melationUpdateLiveRoom) window.melationUpdateLiveRoom(livePayload(room)); }
-function setStatus(message) { const element = document.getElementById('roomStatus'); if (element) element.textContent = message; }
-function ensureHostRailStyles() { if (document.getElementById('roomHostRailStyles')) return; const style=document.createElement('style'); style.id='roomHostRailStyles'; style.textContent='@media (min-width:1281px){.rooms-stage.has-host-panel{display:block!important}.rooms-stage.has-host-panel .rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.room-host-panel{position:fixed!important;left:10px!important;top:120px!important;width:272px!important;max-height:calc(100vh - 140px)!important;overflow:auto!important;z-index:350!important}.room-host-panel h3{font-size:30px!important}.room-host-panel-meta{font-size:8px!important}.room-host-viewer{padding:10px!important}.room-host-panel-note{font-size:8px!important}}'; document.head.appendChild(style); }
+function ensureLiveStatus() { let element=document.getElementById('roomsLiveStatus'); if (element) return element; const heading=document.querySelector('.rooms-section-head'); if (!heading) return null; element=document.createElement('p'); element.id='roomsLiveStatus'; element.className='rooms-live-status'; element.setAttribute('role','status'); element.setAttribute('aria-live','polite'); heading.insertAdjacentElement('afterend',element); return element; }
+function setStatus(message, isError=false) { const element = document.getElementById('roomStatus'); if (element) element.textContent = message; const live=ensureLiveStatus(); if (live) { live.textContent=message||''; live.classList.toggle('is-error',!!isError); } }
+function ensureHostRailStyles() { if (document.getElementById('roomHostRailStyles')) return; const style=document.createElement('style'); style.id='roomHostRailStyles'; style.textContent='.room-card-top{position:relative!important;min-height:20px!important;padding-top:0!important}.room-listeners{position:absolute!important;top:2px!important;right:0!important;text-align:right!important}.room-live-badge{top:0!important;left:0!important}@media (min-width:1281px){.rooms-stage.has-host-panel{display:block!important}.rooms-stage.has-host-panel .rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.room-host-panel{position:fixed!important;left:10px!important;top:120px!important;width:272px!important;max-height:calc(100vh - 140px)!important;overflow:auto!important;z-index:350!important}.room-host-panel h3{font-size:30px!important}.room-host-panel-meta{font-size:8px!important}.room-host-viewer{padding:10px!important}.room-host-panel-note{font-size:8px!important}}'; document.head.appendChild(style); }
 
 function ensureHostPanel() {
   const list = document.getElementById('roomsList'); if (!list) return null;
@@ -130,7 +133,7 @@ async function joinPresence(roomId) {
 
 async function join(id) {
   const room = allRooms().find(item => item.id === id); if (!room) return;
-  if (!hasAccount()) { if (window.MelationCommunity?.openAuthPrompt) window.MelationCommunity.openAuthPrompt(); setStatus('Sign in or create an account to start listening in this room.'); return; }
+  if (!hasAccount()) { if (window.melationOpenAccountGate) window.melationOpenAccountGate(); setStatus('Make an account or sign in to join this room.'); return; }
   const liveCount = roomCounts[room.id];
   if (Number.isFinite(liveCount) && liveCount >= roomCapacity(room)) { showFullDialog(room); return; }
   const queue = roomTrackIds(room).map(trackId => { const item = tracks[trackId]; return { id:trackId, name:item.title, artist:item.artist, src:item.src, art:item.art, page:item.page }; });
@@ -158,7 +161,8 @@ async function turnOff(id) {
 
 async function createRoom(event) {
   event.preventDefault();
-  if (!hasAccount()) { if (window.MelationCommunity?.openAuthPrompt) window.MelationCommunity.openAuthPrompt(); setStatus('Sign in or create an account before opening a room.'); return; }
+  if (!hasAccount()) { if (window.melationOpenAccountGate) window.melationOpenAccountGate(); setStatus('Make an account or sign in before opening a room.'); return; }
+  if (!db || !roomsRef || !sharedRoomsReady) { setStatus(sharedRoomsError || 'Shared rooms are still connecting. Please try again in a moment.',true); return; }
   const name = document.getElementById('roomName').value.trim();
   const maxListeners = roomCapacity({ maxListeners:document.getElementById('roomLimit').value });
   const selected = Array.from(document.querySelectorAll('input[name="roomRelease"]:checked')).map(input => releases[input.value]).filter(Boolean);
@@ -167,20 +171,20 @@ async function createRoom(event) {
   const user = currentUser();
   const createdAtMs=Date.now();
   const room = { id:'room-' + createdAtMs, name, mood:document.getElementById('roomMood').value, trackIds:ids, maxListeners, host:user.displayName || user.username || 'Listener', ownerKey:getOwnerKey(), active:true, loopStartedAtMs:createdAtMs, createdAtMs, updatedAtMs:createdAtMs };
+  try { await setDoc(doc(roomsRef, room.id), room); } catch (error) { setStatus('Could not create a shared room. Publish the current Firestore rules, then try again.',true); return; }
   const local = readLocal(); local.unshift({ ...room, owner:'local' }); writeLocal(local);
-  if (db) { try { await setDoc(doc(roomsRef, room.id), room); } catch (error) { setStatus('Room saved on this device. It could not be shared yet.'); } }
   event.target.reset(); updateLimitValue(); document.querySelector('input[name="roomRelease"][value="album-a-broken-dream"]').checked = true; document.getElementById('roomCreatePanel').hidden = true; render(); setStatus('Your room is live.');
 }
 
 function initRemote() {
-  if (!config.apiKey || !config.projectId || !config.appId) { render(); return; }
+  if (!config.apiKey || !config.projectId || !config.appId) { sharedRoomsError='Shared rooms need Firebase before rooms can be created for everyone.'; render(); setStatus(sharedRoomsError,true); return; }
   try {
     const app = getApps().find(item => item.name === 'listeningRooms') || initializeApp(config, 'listeningRooms');
     db = getFirestore(app); roomsRef = collection(db, ROOT, ROOT_ID, 'rooms');
     render();
     watchPresence(allRooms());
-    onSnapshot(roomsRef, snapshot => { remoteRoomsReady = true; remoteRooms = snapshot.docs.map(item => ({ id:item.id, ...item.data() })).filter(room => room.active !== false); watchPresence(allRooms()); render(); }, () => { remoteRoomsReady = false; remoteRooms = []; watchPresence(allRooms()); render(); });
-  } catch (error) { db = null; render(); }
+    onSnapshot(roomsRef, snapshot => { remoteRoomsReady = true; sharedRoomsReady = true; sharedRoomsError = ''; remoteRooms = snapshot.docs.map(item => ({ id:item.id, ...item.data() })).filter(room => room.active !== false); watchPresence(allRooms()); render(); }, () => { remoteRoomsReady = false; sharedRoomsReady = false; sharedRoomsError = 'Shared rooms are unavailable. Publish the current Firestore rules, then reload.'; remoteRooms = []; watchPresence(allRooms()); render(); setStatus(sharedRoomsError,true); });
+  } catch (error) { db = null; sharedRoomsError='Shared rooms could not connect. Check Firebase, then reload.'; render(); setStatus(sharedRoomsError,true); }
 }
 
 const toggle = document.getElementById('roomCreateToggle');
