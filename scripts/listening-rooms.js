@@ -49,6 +49,7 @@ function viewerNames(room) { return viewerEntries(room).map(viewer => viewer.vie
 function livePayload(room) { return { id:room.id, name:room.name, viewerCount:Number(roomCounts[room.id]) || 0, viewers:viewerNames(room) }; }
 function syncLivePlayer(room) { if (window.melationUpdateLiveRoom) window.melationUpdateLiveRoom(livePayload(room)); }
 function setStatus(message) { const element = document.getElementById('roomStatus'); if (element) element.textContent = message; }
+function ensureHostRailStyles() { if (document.getElementById('roomHostRailStyles')) return; const style=document.createElement('style'); style.id='roomHostRailStyles'; style.textContent='@media (min-width:1281px){.rooms-stage.has-host-panel{display:block!important}.rooms-stage.has-host-panel .rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.room-host-panel{position:fixed!important;left:10px!important;top:120px!important;width:272px!important;max-height:calc(100vh - 140px)!important;overflow:auto!important;z-index:350!important}.room-host-panel h3{font-size:30px!important}.room-host-panel-meta{font-size:8px!important}.room-host-viewer{padding:10px!important}.room-host-panel-note{font-size:8px!important}}'; document.head.appendChild(style); }
 
 function ensureHostPanel() {
   const list = document.getElementById('roomsList'); if (!list) return null;
@@ -59,6 +60,7 @@ function ensureHostPanel() {
   return panel;
 }
 function renderHostPanel(rooms) {
+  ensureHostRailStyles();
   const panel=ensureHostPanel(); if (!panel) return;
   const room=rooms.find(isOwner);
   const stage=panel.parentElement;
