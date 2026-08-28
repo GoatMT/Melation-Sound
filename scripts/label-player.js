@@ -334,6 +334,7 @@
   }
   function updateNavState() {
     var disabled = tracks.length <= 1 || isLiveRoom();
+    play.disabled = isLiveRoom();
     prev.disabled = disabled;
     next.disabled = disabled;
     shuffleButton.disabled = isLiveRoom();
@@ -423,10 +424,21 @@
   window.melationPausePlayer = function () { audio.pause(); };
   window.melationResumePlayer = function () { if (!requireListenerAccount()) return false; if (currentIndex < 0) return window.melationPlayAllShuffled(); audio.play().catch(function () {}); return true; };
   window.melationSetShuffle = function (value) { shuffle = !!value; updateModes(); saveState(); };
+  window.melationSetRepeat = function (value) { repeat = !!value; updateModes(); saveState(); };
   window.melationSetLiveRoom = function (room) {
     if (!room || !room.id) return false;
     liveRoom = { id:String(room.id), name:String(room.name || 'Listening Room'), viewerCount:Math.max(0, Number(room.viewerCount) || 0), viewers:Array.isArray(room.viewers) ? room.viewers.filter(Boolean).slice(0, 12) : [] };
     updateLiveRoom(); saveState(); return true;
+  };
+  window.melationSyncLiveRoomTrack = function (index, offset) {
+    if (!isLiveRoom() || index !== currentIndex || !isFinite(offset)) return false;
+    var applyOffset = function () {
+      if (!isLiveRoom() || index !== currentIndex || !isFinite(audio.duration)) return;
+      audio.currentTime = Math.max(0, Math.min(Math.max(0, audio.duration - 0.15), Number(offset) || 0));
+      audio.play().catch(function () {});
+    };
+    if (audio.readyState >= 1) applyOffset(); else audio.addEventListener('loadedmetadata', applyOffset, { once:true });
+    return true;
   };
   window.melationUpdateLiveRoom = function (room) {
     if (!isLiveRoom() || !room || String(room.id) !== liveRoom.id) return false;

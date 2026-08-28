@@ -16,7 +16,7 @@ service cloud.firestore {
           "username", "usernameKey", "displayName", "pinHash", "createdAtMs"
         ]);
         allow update: if request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(["displayName", "username", "usernameKey", "pinHash", "totalSeconds", "uniqueSongs", "plays", "playlist", "profileBio", "profileImage", "favoriteSong", "streakDays", "lastActiveDate", "recentTracks", "updatedAtMs"]);
+          .hasOnly(["displayName", "username", "usernameKey", "pinHash", "totalSeconds", "uniqueSongs", "plays", "playlist", "profileBio", "profileImage", "favoriteSong", "streakDays", "lastActiveDate", "recentTracks", "listenerZone", "updatedAtMs"]);
         allow delete: if true;
 
         match /listens/{songId} {
@@ -74,6 +74,19 @@ service cloud.firestore {
             && request.resource.data.body.size() <= 300
             && request.resource.data.createdAtMs is number;
           allow update, delete: if false;
+        }
+
+        match /requests/{requestId} {
+          allow read: if true;
+          allow create, update: if request.resource.data.keys().hasAll([
+            "viewerName", "viewerKey", "createdAtMs", "status"
+          ]) && request.resource.data.viewerName is string
+            && request.resource.data.viewerName.size() > 0
+            && request.resource.data.viewerName.size() <= 40
+            && request.resource.data.viewerKey is string
+            && request.resource.data.createdAtMs is number
+            && request.resource.data.status == "pending";
+          allow delete: if false;
         }
       }
 
