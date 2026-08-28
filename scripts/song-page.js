@@ -94,9 +94,16 @@ Whole city know the track
   if (key === '10:20' || key === '1020') key = '10-20';
   var track = tracks[key] || tracks['01'];
   var $ = function(id){ return document.getElementById(id); };
+  // The shared player can be restored with a shuffled or custom playlist queue.
+  // Keep the song's actual ID on this page instead of relying on its position in
+  // whichever queue happens to be active.
   var labelTrackIndex = track.audio ? (track.private ? 0 : ({'01':0,'02':1,'11':2}[key] || 0)) : -1;
   var labelMount = $('label-player-mount');
-  if (labelMount) { labelMount.setAttribute('data-label-start', labelTrackIndex); labelMount.setAttribute('data-song-track', labelTrackIndex); }
+  if (labelMount) {
+    labelMount.setAttribute('data-label-start', labelTrackIndex);
+    labelMount.setAttribute('data-song-track', labelTrackIndex);
+    labelMount.setAttribute('data-song-track-id', track.audio ? key : '');
+  }
   var privateKey = 'melation1020Unlocked';
   function formatTime(value){ if(!isFinite(value)||value<0) return '0:00'; var m=Math.floor(value/60),s=Math.floor(value%60); return m+':'+(s<10?'0':'')+s; }
   function hasPrivateAccess(){ try{return sessionStorage.getItem(privateKey)==='yes';}catch(e){return false;} }

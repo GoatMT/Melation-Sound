@@ -57,7 +57,7 @@
   function formatDate(value) { return value ? new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown date'; }
   function render() {
     list.innerHTML = rows.length ? rows.map(function (item) {
-      return '<article class="admin-key-row ' + (item.active ? '' : 'is-inactive') + '"><div><span>' + escapeHtml(item.songTitle || item.songId) + '</span><code>' + escapeHtml(displayKey(item)) + '</code><small>' + escapeHtml(item.recipient || 'No recipient note') + ' · ' + formatDate(item.createdAtMs) + ' · ' + (Number(item.uses) || 0) + ' downloads</small></div><div class="admin-key-actions"><button type="button" data-copy-hash="' + item.hash + '" ' + (item.key ? '' : 'disabled') + '>Copy</button><button type="button" data-toggle-hash="' + item.hash + '">' + (item.active ? 'Deactivate' : 'Activate') + '</button></div></article>';
+      return '<article class="admin-key-row ' + (item.active ? '' : 'is-inactive') + '"><div><span>' + escapeHtml(item.songTitle || item.songId) + '</span><code>' + escapeHtml(displayKey(item)) + '</code><small>' + escapeHtml(item.recipient || 'No recipient note') + ' · ' + formatDate(item.createdAtMs) + ' · ' + (Number(item.uses) || 0) + ' downloads</small></div><div class="admin-key-actions"><button type="button" data-copy-hash="' + item.hash + '" ' + (item.key ? '' : 'disabled') + '>Copy</button><button type="button" data-toggle-hash="' + item.hash + '">' + (item.active ? 'Deactivate' : 'Activate') + '</button>' + (item.active ? '' : '<button type="button" class="admin-key-delete" data-delete-hash="' + item.hash + '">Delete key</button>') + '</div></article>';
     }).join('') : '<p class="admin-status">No download keys have been generated yet.</p>';
   }
   async function copyText(value) {
@@ -96,7 +96,7 @@
     var response = await fetch(documentUrl(hash), { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (!response.ok) throw new Error('Could not save the key. Publish the updated Firestore rules first.');
     var local = readLocal().filter(function (item) { return item.hash !== hash; }); local.unshift(entry); writeLocal(local);
-    valueTarget.textContent = formatKey(keyDigits); result.hidden = false; recipientInput.value = ''; rows = [entry].concat(rows.filter(function (item) { return item.hash !== hash; })); render(); status.textContent = 'Key generated for ' + song.title + '. Give it to the buyer after payment.'; status.classList.remove('is-error');
+    valueTarget.textContent = formatKey(keyDigits); result.dataset.keyHash = hash; result.hidden = false; recipientInput.value = ''; rows = [entry].concat(rows.filter(function (item) { return item.hash !== hash; })); render(); status.textContent = 'Key generated for ' + song.title + '. Give it to the buyer after payment.'; status.classList.remove('is-error');
   }
   async function toggle(hash) {
     var item = rows.find(function (row) { return row.hash === hash; });
@@ -109,6 +109,18 @@
     var local = readLocal(); var localItem = local.find(function (row) { return row.hash === hash; }); if (localItem) { localItem.active = nextActive; localItem.updatedAtMs = now; writeLocal(local); }
     render(); status.textContent = nextActive ? 'Key activated.' : 'Key deactivated.'; status.classList.remove('is-error');
   }
+  async function removeKey(hash) {
+    var item = rows.find(function (row) { return row.hash === hash; });
+    if (!item) return;
+    if (item.active) throw new Error('Deactivate this key before deleting it.');
+    if (!window.confirm('Delete this deactivated download key? This cannot be undone.')) return;
+    var response = await fetch(documentUrl(hash), { method: 'DELETE' });
+    if (!response.ok) throw new Error('Could not delete this key.');
+    rows = rows.filter(function (row) { return row.hash !== hash; });
+    writeLocal(readLocal().filter(function (row) { return row.hash !== hash; }));
+    if (result.dataset.keyHash === hash) { valueTarget.textContent = ''; result.dataset.keyHash = ''; result.hidden = true; }
+    render(); status.textContent = 'Deactivated key deleted.'; status.classList.remove('is-error');
+  }
 
   generateButton.addEventListener('click', async function () { generateButton.disabled = true; status.textContent = 'Generating key…'; status.classList.remove('is-error'); try { await generate(); } catch (error) { status.textContent = error.message || 'Could not generate a key.'; status.classList.add('is-error'); } finally { generateButton.disabled = false; } });
   copyButton.addEventListener('click', async function () { if (valueTarget.textContent) { await copyText(valueTarget.textContent); copyButton.textContent = 'Copied'; setTimeout(function () { copyButton.textContent = 'Copy key'; }, 1500); } });
@@ -117,6 +129,8 @@
     if (copy) { var copyItem = rows.find(function (row) { return row.hash === copy.getAttribute('data-copy-hash'); }); if (copyItem && copyItem.key) { await copyText(formatKey(copyItem.key)); copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy'; }, 1200); } return; }
     var toggleButton = event.target.closest('[data-toggle-hash]');
     if (toggleButton) { toggleButton.disabled = true; try { await toggle(toggleButton.getAttribute('data-toggle-hash')); } catch (error) { status.textContent = error.message || 'Could not update this key.'; status.classList.add('is-error'); } }
+    var deleteButton = event.target.closest('[data-delete-hash]');
+    if (deleteButton) { deleteButton.disabled = true; try { await removeKey(deleteButton.getAttribute('data-delete-hash')); } catch (error) { status.textContent = error.message || 'Could not delete this key.'; status.classList.add('is-error'); } finally { if (deleteButton.isConnected) deleteButton.disabled = false; } }
   });
   function unlock() { if (!loaded) loadKeys(); }
   window.addEventListener('melation:admin-unlocked', unlock);

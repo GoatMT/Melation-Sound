@@ -25,6 +25,7 @@
   var SHUFFLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3c4 0 6 10 10 10h3M17 4l3 3-3 3M17 14l3 3-3 3M4 17h3c1.2 0 2.1-.5 2.9-1.3M14.1 8.3C15 7.5 15.8 7 17 7h3"/></svg>';
   var REPEAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l3 3-3 3M4 12V9a4 4 0 014-4h12M7 22l-3-3 3-3M20 12v3a4 4 0 01-4 4H4"/></svg>';
   var QUEUE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>';
+  var CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a7.5 7.5 0 01-7.8 7.5 8.6 8.6 0 01-3.6-.8L4 20l1.6-4.1A7.1 7.1 0 014 11.5 7.5 7.5 0 0111.8 4 7.5 7.5 0 0120 11.5Z"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.6"/></svg>';
   var VOL = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.2 9.5a4 4 0 010 5M18.5 7a7.5 7.5 0 010 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>';
   var MUTE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>';
 
@@ -32,7 +33,7 @@
   for (var i = 0; i < 64; i++) bars += '<i style="--bar-delay:' + (i % 9) * 0.08 + 's;--bar-height:' + (8 + ((i * 17) % 20)) + '%"></i>';
   mount.innerHTML = '<div class="label-player" id="labelPlayer" role="region" aria-label="Melation Sound audio player">' +
     '<div class="label-player-inner">' +
-      '<div class="label-player-track"><img src="albums/a-broken-dream/assets/album-cover.png" alt="" id="labelPlayerArt"><div><p id="labelPlayerName">Choose a track</p><p id="labelPlayerArtist">Melation Sound</p></div><a class="label-player-expand" id="labelPlayerExpand" href="songs/song.html?track=01" aria-label="Open current song page" title="Open current song page" hidden>' + EXPAND + '</a></div>' +
+      '<div class="label-player-track"><img src="albums/a-broken-dream/assets/album-cover.png" alt="" id="labelPlayerArt"><div><p id="labelPlayerName">Choose a track</p><p id="labelPlayerArtist">Melation Sound</p><div class="label-player-live" id="labelPlayerLive" hidden><span>LIVE</span><div><strong id="labelPlayerLiveRoom">Listening Room</strong><small id="labelPlayerLiveViewers">0 viewers</small></div><button type="button" id="labelPlayerLeaveRoom">Leave</button></div></div><a class="label-player-expand" id="labelPlayerExpand" href="songs/song.html?track=01" aria-label="Open current song page" title="Open current song page" hidden>' + EXPAND + '</a></div>' +
       '<div class="label-player-controls"><div class="label-player-buttons">' +
         '<button type="button" class="label-player-btn" id="labelPlayerPrev" aria-label="Previous track">' + PREV + '</button>' +
         '<button type="button" class="label-player-btn label-player-play" id="labelPlayerPlay" aria-label="Play" disabled>' + PLAY + '</button>' +
@@ -40,10 +41,12 @@
         '<button type="button" class="label-player-btn label-player-mode" id="labelPlayerShuffle" aria-label="Shuffle off" aria-pressed="false">' + SHUFFLE + '</button>' +
         '<button type="button" class="label-player-btn label-player-mode" id="labelPlayerRepeat" aria-label="Repeat off" aria-pressed="false">' + REPEAT + '</button>' +
         '<button type="button" class="label-player-btn label-player-mode" id="labelPlayerQueue" aria-label="Show queue" aria-expanded="false">' + QUEUE + '</button>' +
+        '<button type="button" class="label-player-btn label-player-room-chat" id="labelPlayerRoomChat" aria-label="Open room chat" aria-expanded="false" hidden>' + CHAT + '<span>Chat</span></button>' +
       '</div><div class="label-player-seek-row"><span id="labelPlayerCurrent">0:00</span><input type="range" id="labelPlayerSeek" min="0" max="100" value="0" step="0.1" aria-label="Seek through track"><span id="labelPlayerDuration">0:00</span></div></div>' +
       '<div class="label-player-volume"><button type="button" class="label-player-volume-button" id="labelPlayerVolume" aria-label="Mute">' + VOL + '</button><div class="label-volume-track" id="labelVolumeTrack" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="label-volume-fill" id="labelVolumeFill"></div><div class="label-volume-thumb" id="labelVolumeThumb"></div></div></div>' +
       '<button type="button" class="label-player-close" id="labelPlayerClose" aria-label="Close player">✕</button>' +
       '<div class="label-player-queue" id="labelPlayerQueuePanel" hidden><div class="label-player-queue-head"><strong>Up next.</strong><button type="button" id="labelPlayerQueueClose" aria-label="Close queue">✕</button></div><ol id="labelPlayerQueueList"></ol></div>' +
+      '<section class="label-room-chat" id="labelRoomChat" aria-label="Live room chat" hidden><header class="label-room-chat-head"><div><span>Live room</span><strong id="labelRoomChatTitle">Room chat</strong></div><button type="button" id="labelRoomChatClose" aria-label="Close room chat">✕</button></header><div class="label-room-chat-messages" id="labelRoomChatMessages" aria-live="polite"><p class="label-room-chat-empty">Open chat to talk with the listeners in this room.</p></div><p class="label-room-chat-status" id="labelRoomChatStatus" role="status"></p><form class="label-room-chat-form" id="labelRoomChatForm"><label class="sr-only" for="labelRoomChatInput">Message the room</label><input id="labelRoomChatInput" type="text" maxlength="300" autocomplete="off" placeholder="Message the room" disabled><button type="submit" id="labelRoomChatSend" disabled>Send</button></form></section>' +
     '</div><div class="label-player-visualizer" aria-hidden="true">' + bars + '</div></div>';
 
   var player = document.getElementById('labelPlayer');
@@ -60,6 +63,15 @@
   var queuePanel = document.getElementById('labelPlayerQueuePanel');
   var queueList = document.getElementById('labelPlayerQueueList');
   var queueClose = document.getElementById('labelPlayerQueueClose');
+  var roomChatButton = document.getElementById('labelPlayerRoomChat');
+  var roomChatPanel = document.getElementById('labelRoomChat');
+  var roomChatClose = document.getElementById('labelRoomChatClose');
+  var roomChatTitle = document.getElementById('labelRoomChatTitle');
+  var roomChatMessages = document.getElementById('labelRoomChatMessages');
+  var roomChatStatus = document.getElementById('labelRoomChatStatus');
+  var roomChatForm = document.getElementById('labelRoomChatForm');
+  var roomChatInput = document.getElementById('labelRoomChatInput');
+  var roomChatSend = document.getElementById('labelRoomChatSend');
   var close = document.getElementById('labelPlayerClose');
   var volumeButton = document.getElementById('labelPlayerVolume');
   var volumeTrack = document.getElementById('labelVolumeTrack');
@@ -68,6 +80,10 @@
   var seek = document.getElementById('labelPlayerSeek');
   var current = document.getElementById('labelPlayerCurrent');
   var duration = document.getElementById('labelPlayerDuration');
+  var live = document.getElementById('labelPlayerLive');
+  var liveRoomName = document.getElementById('labelPlayerLiveRoom');
+  var liveViewers = document.getElementById('labelPlayerLiveViewers');
+  var leaveRoomButton = document.getElementById('labelPlayerLeaveRoom');
   var audio = new Audio();
   audio.preload = 'auto';
   var currentIndex = -1;
@@ -81,6 +97,11 @@
   var STATE_KEY = 'melationPlayerState';
   var accountGate = null;
   var navigationResumeIntent = false;
+  var liveRoom = null;
+  var roomChatApi = null;
+  var roomChatLoad = null;
+  var roomChatUnsubscribe = null;
+  var roomChatRoomId = '';
 
   function hasListenerAccount() {
     var service = window.MelationCommunity;
@@ -118,6 +139,92 @@
     return false;
   }
 
+  function escapeChatText(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (character) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[character];
+    });
+  }
+  function chatUser() {
+    var user = null;
+    try { user = window.MelationCommunity && typeof window.MelationCommunity.user === 'function' ? window.MelationCommunity.user() : null; } catch (error) {}
+    if (!user) {
+      try { user = JSON.parse(sessionStorage.getItem('melationSoundAccount') || 'null'); } catch (error) {}
+    }
+    var name = user && (user.displayName || user.username) ? (user.displayName || user.username) : (sessionStorage.getItem('melationAdminUnlocked') === 'yes' ? 'Melation Admin' : 'Listener');
+    return { name:String(name).slice(0, 40), key:String((user && (user.usernameKey || user.username)) || name).toLowerCase().slice(0, 60) };
+  }
+  function setRoomChatStatus(message) { if (roomChatStatus) roomChatStatus.textContent = message || ''; }
+  function stopRoomChat() {
+    if (roomChatUnsubscribe) roomChatUnsubscribe();
+    roomChatUnsubscribe = null;
+    roomChatRoomId = '';
+  }
+  function renderRoomChat(messages) {
+    if (!roomChatMessages) return;
+    if (!messages.length) {
+      roomChatMessages.innerHTML = '<p class="label-room-chat-empty">No messages yet. Say hi to the room.</p>';
+      return;
+    }
+    roomChatMessages.innerHTML = messages.map(function (message) {
+      var author = escapeChatText(message.author || 'Listener');
+      var body = escapeChatText(message.body || '');
+      return '<article class="label-room-chat-message"><strong>' + author + '</strong><p>' + body + '</p></article>';
+    }).join('');
+    roomChatMessages.scrollTop = roomChatMessages.scrollHeight;
+  }
+  function loadRoomChatApi() {
+    if (roomChatApi) return Promise.resolve(roomChatApi);
+    if (roomChatLoad) return roomChatLoad;
+    var firebaseConfig = window.MELATION_FIREBASE_CONFIG || {};
+    if (!firebaseConfig.apiKey || !firebaseConfig.projectId || !firebaseConfig.appId) return Promise.reject(new Error('Room chat is not configured.'));
+    roomChatLoad = Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js')
+    ]).then(function (modules) {
+      var firebaseApp = modules[0];
+      var firestore = modules[1];
+      var app = firebaseApp.getApps().find(function (item) { return item.name === 'labelRoomChat'; }) || firebaseApp.initializeApp(firebaseConfig, 'labelRoomChat');
+      roomChatApi = { db:firestore.getFirestore(app), collection:firestore.collection, addDoc:firestore.addDoc, query:firestore.query, orderBy:firestore.orderBy, limitToLast:firestore.limitToLast, onSnapshot:firestore.onSnapshot };
+      return roomChatApi;
+    }).catch(function (error) { roomChatLoad = null; throw error; });
+    return roomChatLoad;
+  }
+  function roomChatReference(api, roomId) {
+    return api.collection(api.db, 'melationSound', 'main', 'rooms', roomId, 'chat');
+  }
+  function startRoomChat(roomId) {
+    if (!roomId || roomChatRoomId === roomId) return;
+    stopRoomChat();
+    roomChatRoomId = roomId;
+    setRoomChatStatus('Connecting…');
+    loadRoomChatApi().then(function (api) {
+      if (!isLiveRoom() || liveRoom.id !== roomId || roomChatRoomId !== roomId) return;
+      var messages = api.query(roomChatReference(api, roomId), api.orderBy('createdAtMs', 'asc'), api.limitToLast(80));
+      roomChatUnsubscribe = api.onSnapshot(messages, function (snapshot) {
+        renderRoomChat(snapshot.docs.map(function (item) { return item.data(); }));
+        setRoomChatStatus('');
+      }, function () {
+        setRoomChatStatus('Chat is unavailable right now.');
+      });
+    }).catch(function () {
+      setRoomChatStatus('Chat is unavailable right now.');
+    });
+  }
+  function openRoomChat() {
+    if (!isLiveRoom()) return;
+    roomChatPanel.hidden = false;
+    roomChatButton.setAttribute('aria-expanded', 'true');
+    roomChatTitle.textContent = liveRoom.name || 'Room chat';
+    roomChatInput.disabled = false;
+    roomChatSend.disabled = false;
+    startRoomChat(liveRoom.id);
+    roomChatInput.focus();
+  }
+  function closeRoomChat() {
+    roomChatPanel.hidden = true;
+    roomChatButton.setAttribute('aria-expanded', 'false');
+  }
+
   function readState() {
     try { return JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); } catch (e) { return null; }
   }
@@ -128,6 +235,7 @@
       state.muted = muted;
       state.shuffle = shuffle;
       state.repeat = repeat;
+      state.liveRoom = liveRoom ? { id:liveRoom.id, name:liveRoom.name, viewerCount:liveRoom.viewerCount, viewers:liveRoom.viewers || [] } : null;
       if (currentIndex >= 0) {
         state.src = tracks[currentIndex].src;
         state.currentTime = audio.currentTime || 0;
@@ -167,6 +275,30 @@
     repeatButton.setAttribute('aria-pressed', String(repeat));
     repeatButton.setAttribute('aria-label', repeat ? 'Repeat on' : 'Repeat off');
   }
+  function isLiveRoom() { return !!(liveRoom && liveRoom.id); }
+  function updateLiveRoom() {
+    var active = isLiveRoom();
+    player.classList.toggle('is-live-room', active);
+    live.hidden = !active;
+    roomChatButton.hidden = !active;
+    if (active) {
+      var count = Math.max(0, Number(liveRoom.viewerCount) || 0);
+      var names = Array.isArray(liveRoom.viewers) ? liveRoom.viewers.filter(Boolean) : [];
+      liveRoomName.textContent = liveRoom.name || 'Listening Room';
+      liveViewers.textContent = count + (count === 1 ? ' viewer' : ' viewers') + (names.length ? ' · ' + names.join(', ') : '');
+      liveViewers.title = names.length ? 'In this room: ' + names.join(', ') : 'No listeners are in this room yet.';
+      if (!roomChatPanel.hidden) {
+        roomChatTitle.textContent = liveRoom.name || 'Room chat';
+        startRoomChat(liveRoom.id);
+      }
+    } else {
+      closeRoomChat();
+      stopRoomChat();
+      roomChatInput.disabled = true;
+      roomChatSend.disabled = true;
+    }
+    updateNavState();
+  }
   function renderQueue() {
     queueList.innerHTML = tracks.length ? tracks.map(function (track, index) {
       return '<li class="label-player-queue-item ' + (index === currentIndex ? 'is-current' : '') + '"><button type="button" data-queue-index="' + index + '"><span>' + (index + 1) + '</span><strong>' + track.name + '</strong><small>' + track.artist + '</small></button></li>';
@@ -201,9 +333,13 @@
     window.dispatchEvent(new CustomEvent('melation:playerstate', { detail: { playing: !audio.paused && currentIndex >= 0, hasTrack: currentIndex >= 0, track: currentIndex >= 0 ? tracks[currentIndex] : null } }));
   }
   function updateNavState() {
-    var disabled = tracks.length <= 1;
+    var disabled = tracks.length <= 1 || isLiveRoom();
     prev.disabled = disabled;
     next.disabled = disabled;
+    shuffleButton.disabled = isLiveRoom();
+    repeatButton.disabled = isLiveRoom();
+    queueButton.disabled = isLiveRoom();
+    if (isLiveRoom()) { queuePanel.hidden = true; queueButton.setAttribute('aria-expanded', 'false'); }
     prev.classList.toggle('disabled', disabled);
     next.classList.toggle('disabled', disabled);
   }
@@ -244,14 +380,33 @@
   }
   window.melationPlayTrack = function (index) {
     if (!tracks[index]) return;
+    if (isLiveRoom() && index !== currentIndex) return false;
     if (index === currentIndex) {
       if (audio.paused) { if (!requireListenerAccount()) return; audio.play().catch(function () {}); } else audio.pause();
     } else {
       loadTrack(index, true);
     }
   };
+  window.melationPlayTrackById = function (trackId) {
+    var index = tracks.findIndex(function (track) { return track.id === trackId; });
+    if (isLiveRoom() && (index < 0 || index !== currentIndex)) return false;
+    if (index < 0) {
+      // A playlist may not contain the song whose own page was opened. Restore
+      // the appropriate catalog queue so the page can always play its own song.
+      tracks = (privateReleasePage ? [{ id:'10-20', name:'10:20', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' }] : ALL_TRACKS)
+        .map(function (track) { return Object.assign({}, track); });
+      index = tracks.findIndex(function (track) { return track.id === trackId; });
+      currentIndex = -1;
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      renderQueue();
+      updateNavState();
+    }
+    if (index >= 0) window.melationPlayTrack(index);
+  };
   window.melationSetQueue = function (queue) {
-    if (privateReleasePage || !Array.isArray(queue) || !queue.length) return false;
+    if (privateReleasePage || isLiveRoom() || !Array.isArray(queue) || !queue.length) return false;
     tracks = queue.map(function (track) { return { id:track.id, name:track.name || track.title, artist:track.artist, src:track.src, art:track.art, page:track.page || track.href }; });
     currentIndex = -1;
     audio.pause();
@@ -268,7 +423,29 @@
   window.melationPausePlayer = function () { audio.pause(); };
   window.melationResumePlayer = function () { if (!requireListenerAccount()) return false; if (currentIndex < 0) return window.melationPlayAllShuffled(); audio.play().catch(function () {}); return true; };
   window.melationSetShuffle = function (value) { shuffle = !!value; updateModes(); saveState(); };
+  window.melationSetLiveRoom = function (room) {
+    if (!room || !room.id) return false;
+    liveRoom = { id:String(room.id), name:String(room.name || 'Listening Room'), viewerCount:Math.max(0, Number(room.viewerCount) || 0), viewers:Array.isArray(room.viewers) ? room.viewers.filter(Boolean).slice(0, 12) : [] };
+    updateLiveRoom(); saveState(); return true;
+  };
+  window.melationUpdateLiveRoom = function (room) {
+    if (!isLiveRoom() || !room || String(room.id) !== liveRoom.id) return false;
+    liveRoom.viewerCount = Math.max(0, Number(room.viewerCount) || 0);
+    liveRoom.viewers = Array.isArray(room.viewers) ? room.viewers.filter(Boolean).slice(0, 12) : [];
+    updateLiveRoom(); saveState(); return true;
+  };
+  window.melationLeaveLiveRoom = function () {
+    if (!isLiveRoom()) return false;
+    var previousRoom = liveRoom;
+    var keepPlaying = !audio.paused;
+    liveRoom = null;
+    updateLiveRoom(); saveState();
+    window.dispatchEvent(new CustomEvent('melation:leave-live-room', { detail:{ id:previousRoom.id } }));
+    if (keepPlaying) audio.play().catch(function () {});
+    return true;
+  };
   window.melationPlayAllShuffled = function () {
+    if (isLiveRoom()) return false;
     if (!requireListenerAccount()) return false;
     tracks = ALL_TRACKS.map(function (track) { return Object.assign({}, track); });
     currentIndex = -1;
@@ -288,14 +465,41 @@
     if (currentIndex < 0) loadTrack(0, false);
     if (audio.paused) audio.play().catch(function () {}); else audio.pause();
   });
-  prev.addEventListener('click', function () { if (currentIndex >= 0 && tracks.length > 1) loadTrack(nextTrackIndex(-1), true); });
-  next.addEventListener('click', function () { if (currentIndex >= 0 && tracks.length > 1) loadTrack(nextTrackIndex(1), true); });
-  shuffleButton.addEventListener('click', function () { shuffle = !shuffle; updateModes(); saveState(); });
-  repeatButton.addEventListener('click', function () { repeat = !repeat; updateModes(); saveState(); });
-  queueButton.addEventListener('click', function () { var open = queuePanel.hidden; queuePanel.hidden = !open; queueButton.setAttribute('aria-expanded', String(open)); });
+  prev.addEventListener('click', function () { if (!isLiveRoom() && currentIndex >= 0 && tracks.length > 1) loadTrack(nextTrackIndex(-1), true); });
+  next.addEventListener('click', function () { if (!isLiveRoom() && currentIndex >= 0 && tracks.length > 1) loadTrack(nextTrackIndex(1), true); });
+  shuffleButton.addEventListener('click', function () { if (isLiveRoom()) return; shuffle = !shuffle; updateModes(); saveState(); });
+  repeatButton.addEventListener('click', function () { if (isLiveRoom()) return; repeat = !repeat; updateModes(); saveState(); });
+  queueButton.addEventListener('click', function () { if (isLiveRoom()) return; var open = queuePanel.hidden; queuePanel.hidden = !open; queueButton.setAttribute('aria-expanded', String(open)); });
   queueClose.addEventListener('click', function () { queuePanel.hidden = true; queueButton.setAttribute('aria-expanded', 'false'); });
-  queueList.addEventListener('click', function (event) { var item = event.target.closest('[data-queue-index]'); if (!item) return; var index = Number(item.getAttribute('data-queue-index')); if (isFinite(index)) loadTrack(index, true); });
-  close.addEventListener('click', function () { audio.pause(); player.classList.remove('open'); document.body.classList.remove('has-label-player'); saveState(); });
+  queueList.addEventListener('click', function (event) { if (isLiveRoom()) return; var item = event.target.closest('[data-queue-index]'); if (!item) return; var index = Number(item.getAttribute('data-queue-index')); if (isFinite(index)) loadTrack(index, true); });
+  roomChatButton.addEventListener('click', function () { if (!isLiveRoom()) return; if (roomChatPanel.hidden) openRoomChat(); else closeRoomChat(); });
+  roomChatClose.addEventListener('click', closeRoomChat);
+  roomChatForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var body = roomChatInput.value.trim();
+    if (!body || !isLiveRoom()) return;
+    if (!requireListenerAccount()) return;
+    roomChatSend.disabled = true;
+    setRoomChatStatus('Sending…');
+    var roomId = liveRoom.id;
+    loadRoomChatApi().then(function (api) {
+      if (!isLiveRoom() || liveRoom.id !== roomId) return Promise.reject(new Error('You left the room.'));
+      var user = chatUser();
+      return api.addDoc(roomChatReference(api, roomId), { author:user.name, authorKey:user.key, body:body.slice(0, 300), createdAtMs:Date.now() });
+    }).then(function () {
+      roomChatInput.value = '';
+      setRoomChatStatus('');
+    }).catch(function () {
+      setRoomChatStatus('Could not send your message.');
+    }).finally(function () {
+      if (isLiveRoom()) roomChatSend.disabled = false;
+    });
+  });
+  leaveRoomButton.addEventListener('click', function () { window.melationLeaveLiveRoom(); });
+  close.addEventListener('click', function () {
+    if (isLiveRoom()) { window.melationLeaveLiveRoom(); return; }
+    audio.pause(); player.classList.remove('open'); document.body.classList.remove('has-label-player'); saveState();
+  });
   volumeButton.addEventListener('click', function () { muted = !muted; if (!muted && volume === 0) volume = 1; updateVolume(); saveState(); });
   function volumeFromPointer(event) {
     var rect = volumeTrack.getBoundingClientRect();
@@ -355,7 +559,7 @@
       index = isFinite(index) && tracks[index] ? index : 0;
       if (index === currentIndex) {
         if (audio.paused) { if (!requireListenerAccount()) return; audio.play().catch(function () {}); } else audio.pause();
-      } else {
+      } else if (!isLiveRoom()) {
         loadTrack(index, true);
       }
     });
@@ -363,7 +567,12 @@
   var songTopButton = document.getElementById('songPlayTop');
   if (songTopButton && mount.getAttribute('data-song-track') !== null) {
     songTopButton.addEventListener('click', function () {
-      window.melationPlayTrack(parseInt(mount.getAttribute('data-song-track') || '0', 10));
+      var trackId = mount.getAttribute('data-song-track-id');
+      if (trackId && window.melationPlayTrackById) {
+        window.melationPlayTrackById(trackId);
+      } else {
+        window.melationPlayTrack(parseInt(mount.getAttribute('data-song-track') || '0', 10));
+      }
     });
   }
 
@@ -373,12 +582,16 @@
     muted = !!saved.muted;
     shuffle = !!saved.shuffle;
     repeat = !!saved.repeat;
+    liveRoom = saved.liveRoom && saved.liveRoom.id ? saved.liveRoom : null;
     updateVolume();
     updateModes();
+    updateLiveRoom();
   }
   if (saved && saved.open && !privateReleaseLocked) {
     var shouldResume = !!saved.playing;
-    if (Array.isArray(saved.queue) && saved.queue.length) tracks = saved.queue.map(function (track) { return { id:track.id, name:track.name, artist:track.artist, src:track.src, art:track.art, page:track.page, exclusive:!!track.exclusive }; });
+    // 10:20 is deliberately a one-song release: never import another page's
+    // queue into it, or its play/next/previous controls can point at album songs.
+    if (!privateReleasePage && Array.isArray(saved.queue) && saved.queue.length) tracks = saved.queue.map(function (track) { return { id:track.id, name:track.name, artist:track.artist, src:track.src, art:track.art, page:track.page, exclusive:!!track.exclusive }; });
     var savedIndex = tracks.findIndex(function (track) { return track.src === saved.src; });
     if (savedIndex >= 0) {
       loadTrack(savedIndex, false, true);

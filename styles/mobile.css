@@ -1,0 +1,127 @@
+/* Whole-site phone layout pass. Loaded by pwa.js on every page. */
+@media (max-width:700px){
+  html{-webkit-text-size-adjust:100%}
+  body{overflow-x:clip}
+  .wrap{padding-inline:16px}
+
+  /* The header stays easy to scan without taking up a third of the screen. */
+  .label-nav,nav.site-nav{min-height:0!important;gap:8px!important;padding:10px 16px 9px!important;box-sizing:border-box}
+  .label-brand,.brand{min-width:0;max-width:calc(100% - 56px);gap:8px}
+  .label-brand img{width:38px;height:38px}
+  .label-brand-name,.brand-name{min-width:0;overflow:hidden;font-size:24px;letter-spacing:.09em;text-overflow:ellipsis;white-space:nowrap}
+  .label-links,.nav-links{width:calc(100% + 32px)!important;margin:0 -16px!important;padding:0 16px!important;box-sizing:border-box;justify-content:flex-start!important;gap:3px!important;overflow-x:auto!important;overscroll-behavior-x:contain;scrollbar-width:none;white-space:nowrap}
+  .label-links::-webkit-scrollbar,.nav-links::-webkit-scrollbar{display:none}
+  .label-links a,.nav-links a{flex:0 0 auto;padding:9px 11px!important;font-size:10px!important;line-height:18px}
+  .label-links>a[href="#catalog"],.label-links>a[href$="index.html#catalog"]{font-size:0!important}
+  .label-links>a[href="#catalog"]::before,.label-links>a[href$="index.html#catalog"]::before{content:'Albums';font:10px/18px 'Space Mono',monospace;letter-spacing:.1em}
+  .site-more-menu>summary{padding:9px 8px!important}
+  .site-search{order:3!important;width:100%!important;min-width:0!important;flex:0 0 100%!important;margin:0!important}
+  .site-search input{min-height:42px;padding-top:11px;padding-bottom:11px;font-size:12px}
+  .site-search-results{max-height:min(360px,calc(100dvh - 120px))}
+  .site-more-panel{top:62px!important;right:10px!important;left:10px!important;width:auto!important;max-height:calc(100dvh - 78px);overflow:auto}
+
+  /* Keep the quick mix in its top-right corner without covering the search bar. */
+  .site-quick-mix{top:8px!important;right:10px!important}
+  .site-quick-mix-button{width:44px;min-width:44px;height:44px;padding:2px!important;justify-content:center}
+  .site-quick-mix-button>span:last-child{display:none}
+  .site-quick-mix-icon{width:38px!important;height:38px!important;flex-basis:38px!important}
+
+  .label-hero{gap:34px;padding:48px 0 58px}
+  .label-copy,.label-subpage-intro{font-size:16px;line-height:1.65}
+  .label-section{padding:58px 0 72px}
+  .label-section-head{align-items:flex-start;flex-direction:column;gap:8px}
+  .label-section-title{font-size:46px}
+  .label-section-meta{font-size:10px;line-height:1.45}
+  .label-subpage{padding-top:48px!important;padding-bottom:68px!important}
+  .label-page-title{font-size:clamp(50px,16vw,76px)}
+
+  /* Cards, panels, and common forms keep their content readable at 320–390px. */
+  .community-shell,.playlist-page-shell,.browse-shell,.achievement-shell,.admin-shell{padding-top:48px!important;padding-bottom:78px!important}
+  .community-panel-head,.chart-panel-head,.playlist-panel h2,.song-card-heading{padding:18px!important}
+  .community-panel-head h2,.chart-panel-head h2{font-size:34px!important}
+  .community-auth,.community-user,.song-community-body,.playlist-editor{padding:18px!important}
+  .profile-stat{min-width:calc(50% - 5px);box-sizing:border-box}
+  .profile-song,.listener-row,.playlist-track-row,.playlist-browse-row{padding-inline:14px}
+  .playlist-page-row{gap:10px;padding:12px 14px}
+  .playlist-actions,.playlist-editor-actions,.community-auth-actions,.profile-header-actions{gap:8px}
+  .playlist-actions button,.playlist-actions a,.playlist-editor button,.community-auth button,.community-auth-link{min-height:42px}
+  .browse-card-head{padding:17px}
+  .browse-card-actions{margin-left:0!important}
+  .achievement-card{grid-template-columns:38px minmax(0,1fr) auto;gap:10px;padding:15px}
+  .achievement-copy strong{font-size:20px}
+  .timeline-controls{margin-top:30px;padding:9px;gap:5px}
+  .timeline-controls span{width:100%;margin:0 0 2px}
+  .timeline-controls button{padding:8px 9px}
+
+  /* Listening Rooms and the map become comfortably single-column on phones. */
+  .rooms-shell,.map-shell{padding-bottom:88px}
+  .room-create-panel,.map-panel,.room-card{padding:16px}
+  .room-create-panel h2,.map-panel h2,.rooms-section-head h2{font-size:38px!important}
+  .room-card-top{align-items:flex-start;flex-direction:column;gap:6px}
+  .room-track{margin:15px 0}
+  .room-note{padding:17px;gap:12px}
+  .listener-map-visual{min-height:250px!important}
+  .map-stats{grid-template-columns:1fr 1fr!important}
+  .map-stats div:last-child{grid-column:1/-1}
+
+  /* Bottom player and every overlay fit above mobile browser controls. */
+  body.has-label-player{padding-bottom:calc(174px + env(safe-area-inset-bottom))}
+  .label-player{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
+  .label-player-track{padding-right:26px}
+  .label-player-track img{width:46px;height:46px}
+  .label-player-track p:first-child{font-size:17px}
+  .label-player-buttons{gap:16px!important}
+  .label-player.is-live-room .label-player-track{align-items:flex-start}
+  .label-player.is-live-room .label-player-track img{display:block!important;flex:0 0 46px}
+  .label-player.is-live-room .label-player-track>div{min-width:0;flex:1}
+  .label-player.is-live-room .label-player-live{display:flex!important;flex-wrap:nowrap;gap:6px;width:100%}
+  .label-player.is-live-room .label-player-live>div{min-width:0;flex:1}
+  .label-player.is-live-room .label-player-live button{margin-left:0;flex:0 0 auto}
+  .label-player.is-live-room .label-player-controls,.label-player.is-live-room .label-player-seek-row{display:flex!important}
+  .label-player.is-live-room .label-player-seek-row{margin-top:2px}
+  .label-room-chat{right:8px!important;width:calc(100vw - 16px)!important;max-width:none;padding:13px;box-sizing:border-box}
+  .label-room-chat-messages{max-height:min(280px,42dvh)}
+  .label-account-gate{padding:12px}
+  .single-info-overlay{align-items:flex-end;padding:12px}
+  .single-info-modal,.track-info-modal{width:100%!important;max-width:100%!important;max-height:calc(100dvh - 24px);padding:28px 18px!important;box-sizing:border-box}
+  .single-info-modal h2{font-size:42px}
+  .single-info-details{grid-template-columns:1fr 1fr}
+
+  .release-page .release-section{padding:56px 0}
+  .release-page .release-section-inner{padding:0 16px}
+  .release-page .release-section-head{margin-bottom:30px}
+  .release-page .release-banner{min-height:200px}
+  .release-page .release-banner-text{font-size:clamp(30px,10vw,46px);text-align:center}
+  .release-footer,.song-footer{padding-bottom:26px}
+  .release-footer-row,.song-footer-row,.footer-row,.label-footer-row{gap:14px}
+  .footer-links,.footer-utility-links{gap:8px!important}
+  .footer-links a,.footer-utility-links a{padding:7px 0}
+
+  .song-main{padding-inline:16px}
+  .song-stage{gap:32px;padding-top:36px}
+  .song-heading-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .song-heading-actions a,.song-heading-actions button{text-align:center}
+  .song-lyrics{padding:20px;font-size:14px;line-height:1.75}
+  .song-detail-grid{grid-template-columns:1fr 1fr}
+  .song-detail-grid div{min-height:64px;padding:13px}
+  .song-comment-meta{align-items:flex-start;flex-direction:column;gap:4px}
+  .song-download-key-row,.private-gate-input-row,.song-page .private-gate-input-row{grid-template-columns:1fr}
+  .song-download-key-row button,.private-gate-input-row button,.song-page .private-gate-input-row button{min-height:44px}
+
+  .admin-gate,.admin-tool,.admin-download-keys{padding:18px}
+  .admin-gate-row{flex-direction:column}
+  .admin-gate button{min-height:42px}
+  .admin-key-result code{font-size:17px;overflow-wrap:anywhere}
+}
+
+@media (max-width:420px){
+  .label-brand-name,.brand-name{font-size:21px}
+  .label-kicker{font-size:10px;letter-spacing:.18em}
+  .label-title{font-size:clamp(58px,18vw,76px)}
+  .label-room-chat-form{grid-template-columns:1fr}
+  .label-room-chat-form button{min-height:40px}
+  .song-heading-actions{grid-template-columns:1fr}
+  .profile-stat{min-width:100%}
+  .map-stats{grid-template-columns:1fr!important}
+  .map-stats div:last-child{grid-column:auto}
+}

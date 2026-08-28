@@ -15,11 +15,16 @@ const releases = {
   'album-a-broken-dream': { ids:['01','02','11'] },
   'single-10-20': { ids:['10-20'] }
 };
+const OFFICIAL_ROOMS = [
+  { id:'melation-signal-bloom', name:'Signal Bloom', mood:'Official replay', trackIds:['01','02','11'], currentIndex:0, maxListeners:100, host:'Melation Sound', sponsor:'@RealAcronix', sponsorAvatar:'assets/reala-cronix.png', official:true, active:true },
+  { id:'melation-midnight-dial', name:'Midnight Dial', mood:'After-hours replay', trackIds:['02','11','01'], currentIndex:0, maxListeners:100, host:'Melation Sound', official:true, active:true }
+];
 let db = null;
 let roomsRef = null;
 let remoteRooms = [];
 let remoteRoomsReady = false;
 let roomCounts = {};
+let roomViewers = {};
 let presenceUnsubscribers = new Map();
 let activePresenceRef = null;
 let presenceId = '';
@@ -32,9 +37,13 @@ function currentUser() { return window.MelationCommunity?.user?.() || (() => { t
 function hasAccount() { return !!currentUser(); }
 function roomTrackIds(room) { return Array.isArray(room.trackIds) && room.trackIds.length ? room.trackIds.filter(id => tracks[id]) : ['01']; }
 function roomTrack(room) { const ids = roomTrackIds(room); return tracks[ids[Math.max(0, Number(room.currentIndex) || 0) % ids.length]] || tracks['01']; }
-function allRooms() { const combined = new Map(); remoteRooms.forEach(room => combined.set(room.id, room)); readLocal().forEach(room => { if (!combined.has(room.id)) combined.set(room.id, room); }); return Array.from(combined.values()).filter(room => room.active !== false); }
+function roomCapacity(room) { return Math.max(2, Math.min(100, Number(room.maxListeners) || 100)); }
+function allRooms() { const combined = new Map(); remoteRooms.forEach(room => combined.set(room.id, room)); readLocal().forEach(room => { if (!combined.has(room.id)) combined.set(room.id, room); }); OFFICIAL_ROOMS.forEach(room => combined.set(room.id, room)); return Array.from(combined.values()).filter(room => room.active !== false); }
 function isOwner(room) { return room.owner === 'local' || (room.ownerKey && room.ownerKey === getOwnerKey()); }
 function listenerLabel(room) { if (Object.prototype.hasOwnProperty.call(roomCounts, room.id) && roomCounts[room.id] !== null) return roomCounts[room.id] + (roomCounts[room.id] === 1 ? ' listener' : ' listeners'); return 'Live count unavailable'; }
+function viewerNames(room) { return Array.isArray(roomViewers[room.id]) ? roomViewers[room.id] : []; }
+function livePayload(room) { return { id:room.id, name:room.name, viewerCount:Number(roomCounts[room.id]) || 0, viewers:viewerNames(room) }; }
+function syncLivePlayer(room) { if (window.melationUpdateLiveRoom) window.melationUpdateLiveRoom(livePayload(room)); }
 function setStatus(message) { const element = document.getElementById('roomStatus'); if (element) element.textContent = message; }
 
 function render() {
@@ -43,8 +52,10 @@ function render() {
   const count = document.getElementById('roomsOnlineCount');
   if (count) count.textContent = rooms.length + (rooms.length === 1 ? ' room active' : ' rooms active');
   list.innerHTML = rooms.length ? rooms.map((room, index) => {
-    const track = roomTrack(room); const ids = roomTrackIds(room);
-    return '<article class="room-card" style="--room-delay:' + (index * .08) + 's"><div class="room-card-top"><span class="room-status"><i></i> Live</span><span class="room-listeners">' + escapeHtml(listenerLabel(room)) + '</span></div><h3>' + escapeHtml(room.name) + '</h3><p class="room-host">Hosted by ' + escapeHtml(room.host || 'Listener') + '</p><div class="room-track"><span>Now playing</span><strong>' + escapeHtml(track.title) + '</strong><small>' + escapeHtml(track.artist) + '</small></div><div class="room-card-bottom"><span>' + escapeHtml(room.mood || 'Open studio') + ' · ' + ids.length + ' ' + (ids.length === 1 ? 'track' : 'tracks') + '</span><div class="room-card-actions"><button type="button" data-room-id="' + escapeHtml(room.id) + '">Join room →</button>' + (isOwner(room) ? '<button type="button" class="room-turn-off" data-room-off="' + escapeHtml(room.id) + '">Turn off</button>' : '') + '</div></div></article>';
+    const track = roomTrack(room); const ids = roomTrackIds(room); const names = viewerNames(room); const capacity = roomCapacity(room);
+    const sponsor = room.sponsor ? '<div class="room-sponsor"><img src="' + escapeHtml(room.sponsorAvatar || 'assets/reala-cronix.png') + '" alt=""><span>Sponsored by <strong>' + escapeHtml(room.sponsor) + '</strong></span></div>' : '';
+    const viewers = names.length ? names.join(', ') : 'No listeners yet';
+    return '<article class="room-card ' + (room.sponsor ? 'is-sponsored' : '') + '" style="--room-delay:' + (index * .08) + 's"><div class="room-card-top"><span class="room-status"><i></i> Live</span><span class="room-listeners">' + escapeHtml(listenerLabel(room)) + ' · ' + capacity + ' max</span></div><h3>' + escapeHtml(room.name) + '</h3><p class="room-host">Hosted by ' + escapeHtml(room.host || 'Listener') + '</p>' + sponsor + '<p class="room-viewers"><span>Viewers</span><strong>' + escapeHtml(viewers) + '</strong></p><div class="room-track"><span>Now playing</span><strong>' + escapeHtml(track.title) + '</strong><small>' + escapeHtml(track.artist) + '</small></div><div class="room-card-bottom"><span>' + escapeHtml(room.mood || 'Open studio') + ' · ' + ids.length + ' ' + (ids.length === 1 ? 'track' : 'tracks') + '</span><div class="room-card-actions"><button type="button" data-room-id="' + escapeHtml(room.id) + '">Join room →</button>' + (isOwner(room) ? '<button type="button" class="room-turn-off" data-room-off="' + escapeHtml(room.id) + '">Turn off</button>' : '') + '</div></div></article>';
   }).join('') : '<p class="rooms-empty">No live rooms yet. Create the first one.</p>';
   list.querySelectorAll('[data-room-id]').forEach(button => button.addEventListener('click', () => join(button.dataset.roomId)));
   list.querySelectorAll('[data-room-off]').forEach(button => button.addEventListener('click', () => turnOff(button.dataset.roomOff)));
@@ -58,9 +69,12 @@ function watchPresence(roomList) {
     const presenceRef = collection(db, ROOT, ROOT_ID, 'rooms', room.id, 'presence');
     const unsubscribe = onSnapshot(presenceRef, snapshot => {
       const cutoff = Date.now() - 45000;
-      roomCounts[room.id] = snapshot.docs.filter(item => Number(item.data().lastSeenMs) > cutoff).length;
+      const liveListeners = snapshot.docs.map(item => item.data()).filter(item => Number(item.lastSeenMs) > cutoff);
+      roomCounts[room.id] = liveListeners.length;
+      roomViewers[room.id] = Array.from(new Set(liveListeners.map(item => String(item.viewerName || '').trim()).filter(Boolean))).slice(0, 12);
+      syncLivePlayer(room);
       render();
-    }, () => { roomCounts[room.id] = null; render(); });
+    }, () => { roomCounts[room.id] = null; roomViewers[room.id] = []; syncLivePlayer(room); render(); });
     presenceUnsubscribers.set(room.id, unsubscribe);
   });
 }
@@ -72,18 +86,25 @@ async function joinPresence(roomId) {
   presenceId = presenceId || getOwnerKey() + '-' + Math.random().toString(36).slice(2);
   const reference = doc(db, ROOT, ROOT_ID, 'rooms', roomId, 'presence', presenceId);
   activePresenceRef = reference;
-  try { await setDoc(reference, { joinedAtMs: Date.now(), lastSeenMs: Date.now() }, { merge:true }); } catch (error) { activePresenceRef = null; }
+  const user = currentUser();
+  const viewerName = String(user?.displayName || user?.username || 'Listener').slice(0, 40);
+  try { await setDoc(reference, { joinedAtMs: Date.now(), lastSeenMs: Date.now(), viewerName }, { merge:true }); } catch (error) { activePresenceRef = null; }
 }
 
 async function join(id) {
   const room = allRooms().find(item => item.id === id); if (!room) return;
   if (!hasAccount()) { if (window.MelationCommunity?.openAuthPrompt) window.MelationCommunity.openAuthPrompt(); setStatus('Sign in or create an account to start listening in this room.'); return; }
+  const liveCount = roomCounts[room.id];
+  if (Number.isFinite(liveCount) && liveCount >= roomCapacity(room)) { setStatus('This room is full (' + roomCapacity(room) + ' user limit).'); return; }
   const queue = roomTrackIds(room).map(trackId => { const item = tracks[trackId]; return { id:trackId, name:item.title, artist:item.artist, src:item.src, art:item.art, page:item.page }; });
+  if (window.melationLeaveLiveRoom) window.melationLeaveLiveRoom();
   if (window.melationSetQueue) window.melationSetQueue(queue);
   if (window.melationSetShuffle) window.melationSetShuffle(false);
   const index = Math.max(0, Math.min(Number(room.currentIndex) || 0, queue.length - 1));
   if (window.melationPlayTrack) window.melationPlayTrack(index);
+  if (window.melationSetLiveRoom) window.melationSetLiveRoom(livePayload(room));
   await joinPresence(room.id);
+  syncLivePlayer(room);
   setStatus('You joined “' + room.name + '”. Playing ' + roomTrack(room).title + '.');
 }
 
@@ -99,14 +120,15 @@ async function createRoom(event) {
   event.preventDefault();
   if (!hasAccount()) { if (window.MelationCommunity?.openAuthPrompt) window.MelationCommunity.openAuthPrompt(); setStatus('Sign in or create an account before opening a room.'); return; }
   const name = document.getElementById('roomName').value.trim();
+  const maxListeners = roomCapacity({ maxListeners:document.getElementById('roomLimit').value });
   const selected = Array.from(document.querySelectorAll('input[name="roomRelease"]:checked')).map(input => releases[input.value]).filter(Boolean);
   if (!name || !selected.length) { setStatus('Choose at least one album or single.'); return; }
   const ids = selected.reduce((all, release) => all.concat(release.ids), []);
   const user = currentUser();
-  const room = { id:'room-' + Date.now(), name, mood:document.getElementById('roomMood').value, trackIds:ids, currentIndex:0, host:user.displayName || user.username || 'Listener', ownerKey:getOwnerKey(), active:true, createdAtMs:Date.now(), updatedAtMs:Date.now() };
+  const room = { id:'room-' + Date.now(), name, mood:document.getElementById('roomMood').value, trackIds:ids, currentIndex:0, maxListeners, host:user.displayName || user.username || 'Listener', ownerKey:getOwnerKey(), active:true, createdAtMs:Date.now(), updatedAtMs:Date.now() };
   const local = readLocal(); local.unshift({ ...room, owner:'local' }); writeLocal(local);
   if (db) { try { await setDoc(doc(roomsRef, room.id), room); } catch (error) { setStatus('Room saved on this device. It could not be shared yet.'); } }
-  event.target.reset(); document.querySelector('input[name="roomRelease"][value="album-a-broken-dream"]').checked = true; document.getElementById('roomCreatePanel').hidden = true; render(); setStatus('Your room is live.');
+  event.target.reset(); updateLimitValue(); document.querySelector('input[name="roomRelease"][value="album-a-broken-dream"]').checked = true; document.getElementById('roomCreatePanel').hidden = true; render(); setStatus('Your room is live.');
 }
 
 function initRemote() {
@@ -114,7 +136,9 @@ function initRemote() {
   try {
     const app = getApps().find(item => item.name === 'listeningRooms') || initializeApp(config, 'listeningRooms');
     db = getFirestore(app); roomsRef = collection(db, ROOT, ROOT_ID, 'rooms');
-    onSnapshot(roomsRef, snapshot => { remoteRoomsReady = true; remoteRooms = snapshot.docs.map(item => ({ id:item.id, ...item.data() })).filter(room => room.active !== false); watchPresence(remoteRooms); render(); }, () => { remoteRoomsReady = false; remoteRooms = []; render(); });
+    render();
+    watchPresence(allRooms());
+    onSnapshot(roomsRef, snapshot => { remoteRoomsReady = true; remoteRooms = snapshot.docs.map(item => ({ id:item.id, ...item.data() })).filter(room => room.active !== false); watchPresence(allRooms()); render(); }, () => { remoteRoomsReady = false; remoteRooms = []; watchPresence(allRooms()); render(); });
   } catch (error) { db = null; render(); }
 }
 
@@ -123,6 +147,12 @@ const panel = document.getElementById('roomCreatePanel');
 if (toggle && panel) toggle.addEventListener('click', () => { panel.hidden = !panel.hidden; if (!panel.hidden) document.getElementById('roomName').focus(); });
 const form = document.getElementById('roomCreateForm');
 if (form) form.addEventListener('submit', createRoom);
+const limitInput = document.getElementById('roomLimit');
+const limitValue = document.getElementById('roomLimitValue');
+function updateLimitValue() { if (limitInput && limitValue) limitValue.textContent = limitInput.value + ' user limit'; }
+if (limitInput) limitInput.addEventListener('input', updateLimitValue);
+updateLimitValue();
 setInterval(() => { if (activePresenceRef) setDoc(activePresenceRef, { lastSeenMs:Date.now() }, { merge:true }).catch(() => {}); render(); }, 15000);
 window.addEventListener('pagehide', () => { if (activePresenceRef) deleteDoc(activePresenceRef).catch(() => {}); });
+window.addEventListener('melation:leave-live-room', () => { leavePresence(); });
 initRemote();

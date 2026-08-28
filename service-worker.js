@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melation-sound-shell-v2';
+const CACHE_NAME = 'melation-sound-shell-v4';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -13,7 +13,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
   if (request.destination === 'audio' || request.url.includes('firestore.googleapis.com')) return;
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(request, copy)); return response; }).catch(() => caches.match(request).then(response => response || caches.match('./index.html'))));
+    event.respondWith(fetch(request, { cache: 'no-store' }).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(request, copy)); return response; }).catch(() => caches.match(request).then(response => response || caches.match('./index.html'))));
     return;
   }
   const isCode = request.destination === 'script' || request.destination === 'style';

@@ -13,6 +13,7 @@
 
 .site-search {
   position: relative;
+  order: 3;
   z-index: 220;
   flex: 0 1 220px;
   min-width: 170px;
