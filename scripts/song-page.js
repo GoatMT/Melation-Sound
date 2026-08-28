@@ -118,4 +118,6 @@ Whole city know the track
   function reactOnPage(type){ var service=window.MelationCommunity || window.MelationEngagement; if(!service || !service.react)return; var result=service.react(key,type); if(result && typeof result.then==='function')result.then(updateEngagement); else updateEngagement(); }
   $('songLike').addEventListener('click',function(){reactOnPage('like');});
   $('songDislike').addEventListener('click',function(){reactOnPage('dislike');});
+  var copyLink = $('songCopyLink');
+  if (copyLink) copyLink.addEventListener('click', async function () { var url = new URL(window.location.href); try { await navigator.clipboard.writeText(url.href); copyLink.textContent = 'Link copied'; } catch (error) { copyLink.textContent = url.href; } setTimeout(function () { copyLink.textContent = 'Copy link'; }, 1800); });
 }());

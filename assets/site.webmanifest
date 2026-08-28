@@ -1,9 +1,12 @@
 {
+  "id": "../",
   "name": "Melation Sound",
   "short_name": "Melation Sound",
   "start_url": "../index.html",
   "scope": "../",
   "display": "standalone",
+  "orientation": "any",
+  "description": "Stream and explore the Melation Sound catalog.",
   "background_color": "#020509",
   "theme_color": "#020509",
   "icons": [
@@ -11,7 +14,7 @@
       "src": "melation-sound.png",
       "sizes": "1280x1280",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }

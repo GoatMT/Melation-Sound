@@ -16,6 +16,9 @@
   var PREV = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 6L9 12l11 6z"/></svg>';
   var NEXT = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM4 6l11 6-11 6z"/></svg>';
   var EXPAND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M3 3l7 7M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7M16 21h5v-5M21 21l-7-7"/></svg>';
+  var SHUFFLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3c4 0 6 10 10 10h3M17 4l3 3-3 3M17 14l3 3-3 3M4 17h3c1.2 0 2.1-.5 2.9-1.3M14.1 8.3C15 7.5 15.8 7 17 7h3"/></svg>';
+  var REPEAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l3 3-3 3M4 12V9a4 4 0 014-4h12M7 22l-3-3 3-3M20 12v3a4 4 0 01-4 4H4"/></svg>';
+  var QUEUE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>';
   var VOL = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.2 9.5a4 4 0 010 5M18.5 7a7.5 7.5 0 010 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>';
   var MUTE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>';
 
@@ -28,9 +31,13 @@
         '<button type="button" class="label-player-btn" id="labelPlayerPrev" aria-label="Previous track">' + PREV + '</button>' +
         '<button type="button" class="label-player-btn label-player-play" id="labelPlayerPlay" aria-label="Play" disabled>' + PLAY + '</button>' +
         '<button type="button" class="label-player-btn" id="labelPlayerNext" aria-label="Next track">' + NEXT + '</button>' +
+        '<button type="button" class="label-player-btn label-player-mode" id="labelPlayerShuffle" aria-label="Shuffle off" aria-pressed="false">' + SHUFFLE + '</button>' +
+        '<button type="button" class="label-player-btn label-player-mode" id="labelPlayerRepeat" aria-label="Repeat off" aria-pressed="false">' + REPEAT + '</button>' +
+        '<button type="button" class="label-player-btn label-player-mode" id="labelPlayerQueue" aria-label="Show queue" aria-expanded="false">' + QUEUE + '</button>' +
       '</div><div class="label-player-seek-row"><span id="labelPlayerCurrent">0:00</span><input type="range" id="labelPlayerSeek" min="0" max="100" value="0" step="0.1" aria-label="Seek through track"><span id="labelPlayerDuration">0:00</span></div></div>' +
       '<div class="label-player-volume"><button type="button" class="label-player-volume-button" id="labelPlayerVolume" aria-label="Mute">' + VOL + '</button><div class="label-volume-track" id="labelVolumeTrack" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="label-volume-fill" id="labelVolumeFill"></div><div class="label-volume-thumb" id="labelVolumeThumb"></div></div></div>' +
       '<button type="button" class="label-player-close" id="labelPlayerClose" aria-label="Close player">✕</button>' +
+      '<div class="label-player-queue" id="labelPlayerQueuePanel" hidden><div class="label-player-queue-head"><strong>Up next.</strong><button type="button" id="labelPlayerQueueClose" aria-label="Close queue">✕</button></div><ol id="labelPlayerQueueList"></ol></div>' +
     '</div><div class="label-player-visualizer" aria-hidden="true">' + bars + '</div></div>';
 
   var player = document.getElementById('labelPlayer');
@@ -41,6 +48,12 @@
   var play = document.getElementById('labelPlayerPlay');
   var prev = document.getElementById('labelPlayerPrev');
   var next = document.getElementById('labelPlayerNext');
+  var shuffleButton = document.getElementById('labelPlayerShuffle');
+  var repeatButton = document.getElementById('labelPlayerRepeat');
+  var queueButton = document.getElementById('labelPlayerQueue');
+  var queuePanel = document.getElementById('labelPlayerQueuePanel');
+  var queueList = document.getElementById('labelPlayerQueueList');
+  var queueClose = document.getElementById('labelPlayerQueueClose');
   var close = document.getElementById('labelPlayerClose');
   var volumeButton = document.getElementById('labelPlayerVolume');
   var volumeTrack = document.getElementById('labelVolumeTrack');
@@ -54,6 +67,8 @@
   var currentIndex = -1;
   var volume = 1;
   var muted = false;
+  var shuffle = false;
+  var repeat = false;
   var seeking = false;
   var communityPlayedFor = '';
   var communityLastReportedTime = 0;
@@ -100,7 +115,7 @@
   function saveState() {
     if (currentIndex < 0) return;
     try {
-      localStorage.setItem(STATE_KEY, JSON.stringify({ src: tracks[currentIndex].src, currentTime: audio.currentTime || 0, volume: volume, muted: muted, open: player.classList.contains('open') }));
+      localStorage.setItem(STATE_KEY, JSON.stringify({ src: tracks[currentIndex].src, currentTime: audio.currentTime || 0, volume: volume, muted: muted, shuffle: shuffle, repeat: repeat, open: player.classList.contains('open') }));
     } catch (e) {}
   }
   function formatTime(seconds) {
@@ -122,6 +137,27 @@
     volumeThumb.style.bottom = percent + '%';
     volumeTrack.classList.toggle('is-muted', muted || volume === 0);
     volumeTrack.setAttribute('aria-valuenow', percent);
+  }
+  function updateModes() {
+    shuffleButton.classList.toggle('is-active', shuffle);
+    shuffleButton.setAttribute('aria-pressed', String(shuffle));
+    shuffleButton.setAttribute('aria-label', shuffle ? 'Shuffle on' : 'Shuffle off');
+    repeatButton.classList.toggle('is-active', repeat);
+    repeatButton.setAttribute('aria-pressed', String(repeat));
+    repeatButton.setAttribute('aria-label', repeat ? 'Repeat on' : 'Repeat off');
+  }
+  function renderQueue() {
+    queueList.innerHTML = tracks.length ? tracks.map(function (track, index) {
+      return '<li class="label-player-queue-item ' + (index === currentIndex ? 'is-current' : '') + '"><button type="button" data-queue-index="' + index + '"><span>' + (index + 1) + '</span><strong>' + track.name + '</strong><small>' + track.artist + '</small></button></li>';
+    }).join('') : '<li class="label-player-queue-empty">No tracks in the queue.</li>';
+  }
+  function nextTrackIndex(direction) {
+    if (tracks.length <= 1) return currentIndex;
+    if (direction > 0 && shuffle) {
+      var choices = tracks.map(function (_, index) { return index; }).filter(function (index) { return index !== currentIndex; });
+      return choices[Math.floor(Math.random() * choices.length)];
+    }
+    return (currentIndex + direction + tracks.length) % tracks.length;
   }
   function updateButtons() {
     play.innerHTML = audio.paused ? PLAY : PAUSE;
@@ -180,6 +216,7 @@
     updateSeekFill(0);
     updateButtons();
     updateNavState();
+    renderQueue();
     if (autoplay) audio.play().catch(function () {});
     saveState();
   }
@@ -201,6 +238,7 @@
     player.classList.remove('open', 'is-playing');
     updateNavState();
     updateButtons();
+    renderQueue();
     return true;
   };
 
@@ -209,8 +247,13 @@
     if (currentIndex < 0) loadTrack(0, false);
     if (audio.paused) audio.play().catch(function () {}); else audio.pause();
   });
-  prev.addEventListener('click', function () { if (currentIndex >= 0 && tracks.length > 1) loadTrack((currentIndex - 1 + tracks.length) % tracks.length, true); });
-  next.addEventListener('click', function () { if (currentIndex >= 0 && tracks.length > 1) loadTrack((currentIndex + 1) % tracks.length, true); });
+  prev.addEventListener('click', function () { if (currentIndex >= 0 && tracks.length > 1) loadTrack(nextTrackIndex(-1), true); });
+  next.addEventListener('click', function () { if (currentIndex >= 0 && tracks.length > 1) loadTrack(nextTrackIndex(1), true); });
+  shuffleButton.addEventListener('click', function () { shuffle = !shuffle; updateModes(); saveState(); });
+  repeatButton.addEventListener('click', function () { repeat = !repeat; updateModes(); saveState(); });
+  queueButton.addEventListener('click', function () { var open = queuePanel.hidden; queuePanel.hidden = !open; queueButton.setAttribute('aria-expanded', String(open)); });
+  queueClose.addEventListener('click', function () { queuePanel.hidden = true; queueButton.setAttribute('aria-expanded', 'false'); });
+  queueList.addEventListener('click', function (event) { var item = event.target.closest('[data-queue-index]'); if (!item) return; var index = Number(item.getAttribute('data-queue-index')); if (isFinite(index)) loadTrack(index, true); });
   close.addEventListener('click', function () { audio.pause(); player.classList.remove('open'); document.body.classList.remove('has-label-player'); saveState(); });
   volumeButton.addEventListener('click', function () { muted = !muted; if (!muted && volume === 0) volume = 1; updateVolume(); saveState(); });
   function volumeFromPointer(event) {
@@ -244,9 +287,11 @@
   audio.addEventListener('loadedmetadata', function () { duration.textContent = formatTime(audio.duration); });
   audio.addEventListener('play', function () { if (currentIndex >= 0 && communityPlayedFor !== tracks[currentIndex].id) { communityPlayedFor = tracks[currentIndex].id; if (window.MelationCommunity) window.MelationCommunity.recordPlay(tracks[currentIndex].id); } updateButtons(); });
   audio.addEventListener('pause', function () { updateButtons(); saveState(); });
-  audio.addEventListener('ended', function () { loadTrack((currentIndex + 1) % tracks.length, true); });
+  audio.addEventListener('ended', function () { if (repeat && currentIndex >= 0) loadTrack(currentIndex, true); else if (tracks.length > 1) loadTrack(nextTrackIndex(1), true); else { audio.currentTime = 0; updateButtons(); } });
   window.addEventListener('pagehide', saveState);
   updateVolume();
+  updateModes();
+  renderQueue();
   updateNavState();
   document.querySelectorAll('.js-label-play').forEach(function (button) {
     button.addEventListener('click', function () {
@@ -272,7 +317,10 @@
     if (savedIndex >= 0) {
       volume = typeof saved.volume === 'number' ? saved.volume : 1;
       muted = !!saved.muted;
+      shuffle = !!saved.shuffle;
+      repeat = !!saved.repeat;
       updateVolume();
+      updateModes();
       loadTrack(savedIndex, false);
       audio.addEventListener('loadedmetadata', function () { if (saved.currentTime && audio.duration) audio.currentTime = Math.min(saved.currentTime, audio.duration); }, { once: true });
     }
