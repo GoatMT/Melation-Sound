@@ -30,8 +30,11 @@ let activePresenceRef = null;
 let presenceId = '';
 let lastPlaybackSignature = '';
 let lastPlaybackSyncMs = 0;
+let lastPresenceHeartbeatMs = 0;
 let sharedRoomsReady = false;
 let sharedRoomsError = '';
+const PRESENCE_HEARTBEAT_MS = 4000;
+const PRESENCE_STALE_AFTER_MS = 12000;
 
 function escapeHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function readLocal() { try { const value = JSON.parse(localStorage.getItem('melationListeningRooms') || '[]'); return Array.isArray(value) ? value.filter(room => room && room.owner === 'local' && room.active !== false) : []; } catch (error) { return []; } }
@@ -52,7 +55,7 @@ function livePayload(room) { return { id:room.id, name:room.name, viewerCount:Nu
 function syncLivePlayer(room) { if (window.melationUpdateLiveRoom) window.melationUpdateLiveRoom(livePayload(room)); }
 function ensureLiveStatus() { let element=document.getElementById('roomsLiveStatus'); if (element) return element; const heading=document.querySelector('.rooms-section-head'); if (!heading) return null; element=document.createElement('p'); element.id='roomsLiveStatus'; element.className='rooms-live-status'; element.setAttribute('role','status'); element.setAttribute('aria-live','polite'); heading.insertAdjacentElement('afterend',element); return element; }
 function setStatus(message, isError=false) { const element = document.getElementById('roomStatus'); if (element) element.textContent = message; const live=ensureLiveStatus(); if (live) { live.textContent=message||''; live.classList.toggle('is-error',!!isError); } }
-function ensureHostRailStyles() { if (document.getElementById('roomHostRailStyles')) return; const style=document.createElement('style'); style.id='roomHostRailStyles'; style.textContent='.room-card-top{position:relative!important;min-height:20px!important;padding-top:0!important}.room-listeners{position:absolute!important;top:2px!important;right:0!important;text-align:right!important}.room-live-badge{top:0!important;left:0!important}@media (min-width:1281px){.rooms-stage.has-host-panel{display:block!important}.rooms-stage.has-host-panel .rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.room-host-panel{position:fixed!important;left:10px!important;top:120px!important;width:272px!important;max-height:calc(100vh - 140px)!important;overflow:auto!important;z-index:350!important}.room-host-panel h3{font-size:30px!important}.room-host-panel-meta{font-size:8px!important}.room-host-viewer{padding:10px!important}.room-host-panel-note{font-size:8px!important}}'; document.head.appendChild(style); }
+function ensureHostRailStyles() { if (document.getElementById('roomHostRailStyles')) return; const style=document.createElement('style'); style.id='roomHostRailStyles'; style.textContent='.room-card-top{position:relative!important;min-height:20px!important;padding-top:0!important}.room-listeners{position:absolute!important;top:2px!important;right:0!important;text-align:right!important}.room-live-badge{top:0!important;left:0!important}.room-host-open-button{margin-left:auto;min-height:38px;padding:0 15px;border:1px solid #1979c9;background:#071624;color:#92cbff;font:700 10px/1 "Space Mono",monospace;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}.room-host-open-button:hover,.room-host-open-button:focus-visible{background:#0c2942;color:#fff;outline:none}@media (max-width:640px){.rooms-command-bar{align-items:flex-start!important;gap:12px!important}.room-host-open-button{min-height:36px;padding:0 11px;font-size:9px}}@media (min-width:1281px){.rooms-stage.has-host-panel{display:block!important}.rooms-stage.has-host-panel .rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.room-host-panel{position:fixed!important;left:10px!important;top:120px!important;width:272px!important;max-height:calc(100vh - 140px)!important;overflow:auto!important;z-index:350!important}.room-host-panel h3{font-size:30px!important}.room-host-panel-meta{font-size:8px!important}.room-host-viewer{padding:10px!important}.room-host-panel-note{font-size:8px!important}}'; document.head.appendChild(style); }
 
 function ensureHostPanel() {
   const list = document.getElementById('roomsList'); if (!list) return null;
@@ -105,7 +108,7 @@ function watchPresence(roomList) {
     if (presenceUnsubscribers.has(room.id) || !db) return;
     const presenceRef = collection(db, ROOT, ROOT_ID, 'rooms', room.id, 'presence');
     const unsubscribe = onSnapshot(presenceRef, snapshot => {
-      const cutoff = Date.now() - 45000;
+      const cutoff = Date.now() - PRESENCE_STALE_AFTER_MS;
       const entries = snapshot.docs.map(item => ({ id:item.id, ...item.data() }));
       const kicked = entries.find(item => item.id === presenceId && item.kicked === true);
       if (kicked) { leavePresence(); if (window.melationLeaveLiveRoom) window.melationLeaveLiveRoom(); setStatus('You were removed from this listening room by its host.'); }
@@ -119,7 +122,19 @@ function watchPresence(roomList) {
   });
 }
 
-async function leavePresence() { if (!activePresenceRef) return; const previous = activePresenceRef; activePresenceRef = null; try { await deleteDoc(previous); } catch (error) {} }
+async function leavePresence() {
+  if (!activePresenceRef) return;
+  const previous = activePresenceRef;
+  const roomId = previous.parent.parent.id;
+  activePresenceRef = null;
+  lastPresenceHeartbeatMs = 0;
+  if (presenceId && Array.isArray(roomViewers[roomId])) {
+    roomViewers[roomId] = roomViewers[roomId].filter(viewer => viewer.id !== presenceId);
+    roomCounts[roomId] = roomViewers[roomId].length;
+    render();
+  }
+  try { await deleteDoc(previous); } catch (error) {}
+}
 async function joinPresence(roomId) {
   if (!db) return;
   await leavePresence();
@@ -128,7 +143,15 @@ async function joinPresence(roomId) {
   activePresenceRef = reference;
   const user = currentUser();
   const viewerName = String(user?.displayName || user?.username || 'Listener').slice(0, 40);
-  try { await setDoc(reference, { joinedAtMs: Date.now(), lastSeenMs: Date.now(), viewerName, viewerKey:String(user?.usernameKey || presenceId), kicked:false }, { merge:true }); } catch (error) { activePresenceRef = null; }
+  try {
+    const now = Date.now();
+    await setDoc(reference, { joinedAtMs: now, lastSeenMs: now, viewerName, viewerKey:String(user?.usernameKey || presenceId), kicked:false }, { merge:true });
+    lastPresenceHeartbeatMs = now;
+    const viewers = Array.isArray(roomViewers[roomId]) ? roomViewers[roomId].filter(viewer => viewer.id !== presenceId) : [];
+    roomViewers[roomId] = viewers.concat({ id:presenceId, viewerName, viewerKey:String(user?.usernameKey || presenceId) });
+    roomCounts[roomId] = roomViewers[roomId].length;
+    render();
+  } catch (error) { activePresenceRef = null; lastPresenceHeartbeatMs = 0; }
 }
 
 async function join(id) {
@@ -162,7 +185,7 @@ async function turnOff(id) {
 async function createRoom(event) {
   event.preventDefault();
   if (!hasAccount()) { if (window.melationOpenAccountGate) window.melationOpenAccountGate(); setStatus('Make an account or sign in before opening a room.'); return; }
-  if (!db || !roomsRef || !sharedRoomsReady) { setStatus(sharedRoomsError || 'Shared rooms are still connecting. Please try again in a moment.',true); return; }
+  if (!db || !roomsRef) { setStatus(sharedRoomsError || 'Shared rooms are still connecting. Please try again in a moment.',true); return; }
   const name = document.getElementById('roomName').value.trim();
   const maxListeners = roomCapacity({ maxListeners:document.getElementById('roomLimit').value });
   const selected = Array.from(document.querySelectorAll('input[name="roomRelease"]:checked')).map(input => releases[input.value]).filter(Boolean);
@@ -170,7 +193,7 @@ async function createRoom(event) {
   const ids = selected.reduce((all, release) => all.concat(release.ids), []);
   const user = currentUser();
   const createdAtMs=Date.now();
-  const room = { id:'room-' + createdAtMs, name, mood:document.getElementById('roomMood').value, trackIds:ids, maxListeners, host:user.displayName || user.username || 'Listener', ownerKey:getOwnerKey(), active:true, loopStartedAtMs:createdAtMs, createdAtMs, updatedAtMs:createdAtMs };
+  const room = { id:'room-' + createdAtMs, name, mood:document.getElementById('roomMood').value, trackIds:ids, currentIndex:0, maxListeners, host:user.displayName || user.username || 'Listener', ownerKey:getOwnerKey(), active:true, loopStartedAtMs:createdAtMs, createdAtMs, updatedAtMs:createdAtMs };
   try { await setDoc(doc(roomsRef, room.id), room); } catch (error) { setStatus('Could not create a shared room. Publish the current Firestore rules, then try again.',true); return; }
   const local = readLocal(); local.unshift({ ...room, owner:'local' }); writeLocal(local);
   event.target.reset(); updateLimitValue(); document.querySelector('input[name="roomRelease"][value="album-a-broken-dream"]').checked = true; document.getElementById('roomCreatePanel').hidden = true; render(); setStatus('Your room is live.');
@@ -187,9 +210,29 @@ function initRemote() {
   } catch (error) { db = null; sharedRoomsError='Shared rooms could not connect. Check Firebase, then reload.'; render(); setStatus(sharedRoomsError,true); }
 }
 
-const toggle = document.getElementById('roomCreateToggle');
 const panel = document.getElementById('roomCreatePanel');
-if (toggle && panel) toggle.addEventListener('click', () => { panel.hidden = !panel.hidden; if (!panel.hidden) document.getElementById('roomName').focus(); });
+function ensureRoomCreateToggle() {
+  let toggle = document.getElementById('roomCreateToggle');
+  if (!toggle) {
+    const commandBar = document.querySelector('.rooms-command-bar');
+    if (!commandBar) return;
+    ensureHostRailStyles();
+    toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.id = 'roomCreateToggle';
+    toggle.className = 'room-host-open-button';
+    toggle.textContent = 'Host a room';
+    toggle.setAttribute('aria-controls', 'roomCreatePanel');
+    commandBar.appendChild(toggle);
+  }
+  if (!panel) return;
+  toggle.addEventListener('click', () => {
+    panel.hidden = !panel.hidden;
+    toggle.setAttribute('aria-expanded', String(!panel.hidden));
+    if (!panel.hidden) document.getElementById('roomName').focus();
+  });
+}
+ensureRoomCreateToggle();
 const form = document.getElementById('roomCreateForm');
 if (form) form.addEventListener('submit', createRoom);
 const limitInput = document.getElementById('roomLimit');
@@ -197,7 +240,7 @@ const limitValue = document.getElementById('roomLimitValue');
 function updateLimitValue() { if (limitInput && limitValue) limitValue.textContent = limitInput.value + ' user limit'; }
 if (limitInput) limitInput.addEventListener('input', updateLimitValue);
 updateLimitValue();
-setInterval(() => { const now=Date.now(); if (activePresenceRef && now % 15000 < 1000) setDoc(activePresenceRef, { lastSeenMs:now }, { merge:true }).catch(() => {}); const signature=allRooms().map(room=>room.id+':'+roomPlayback(room,now).index).join('|'); const changed=signature!==lastPlaybackSignature; if(changed){lastPlaybackSignature=signature;render();} if(activePresenceRef && (changed || now-lastPlaybackSyncMs>=10000)){const room=allRooms().find(item=>item.id===activePresenceRef.parent.parent.id);const playback=room&&roomPlayback(room,now);if(playback&&window.melationSyncLiveRoomTrack){window.melationSyncLiveRoomTrack(playback.index,playback.offset);lastPlaybackSyncMs=now;}} }, 1000);
+setInterval(() => { const now=Date.now(); if (activePresenceRef && now-lastPresenceHeartbeatMs>=PRESENCE_HEARTBEAT_MS) { lastPresenceHeartbeatMs=now; setDoc(activePresenceRef, { lastSeenMs:now }, { merge:true }).catch(() => { lastPresenceHeartbeatMs=0; }); } const signature=allRooms().map(room=>room.id+':'+roomPlayback(room,now).index).join('|'); const changed=signature!==lastPlaybackSignature; if(changed){lastPlaybackSignature=signature;render();} if(activePresenceRef && (changed || now-lastPlaybackSyncMs>=10000)){const room=allRooms().find(item=>item.id===activePresenceRef.parent.parent.id);const playback=room&&roomPlayback(room,now);if(playback&&window.melationSyncLiveRoomTrack){window.melationSyncLiveRoomTrack(playback.index,playback.offset);lastPlaybackSyncMs=now;}} }, 1000);
 window.addEventListener('pagehide', () => { if (activePresenceRef) deleteDoc(activePresenceRef).catch(() => {}); });
 window.addEventListener('melation:leave-live-room', () => { leavePresence(); });
 initRemote();

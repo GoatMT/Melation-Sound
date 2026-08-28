@@ -103,6 +103,15 @@
   var roomChatUnsubscribe = null;
   var roomChatRoomId = '';
 
+  function ensureLiveRoomPlayerStyles() {
+    if (document.getElementById('labelPlayerLiveRoomStyles')) return;
+    var style = document.createElement('style');
+    style.id = 'labelPlayerLiveRoomStyles';
+    style.textContent = '.label-player.is-live-room .label-player-seek-row input{pointer-events:none;cursor:not-allowed;opacity:.58}.label-player.is-live-room .label-player-live{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:7px}.label-player.is-live-room .label-player-live>button{grid-column:1/-1;justify-self:center;min-width:110px;min-height:36px;margin-top:4px;padding:9px 18px;border:1px solid #62b2ff;background:#0a2944;color:#e9f6ff;font:700 10px/1 "Space Mono",monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}.label-player.is-live-room .label-player-live>button:hover,.label-player.is-live-room .label-player-live>button:focus-visible{background:#14517f;outline:2px solid #9bd6ff;outline-offset:2px}@media (max-width:700px){.label-player.is-live-room .label-player-live>button{min-width:96px;min-height:34px;padding:8px 14px;font-size:9px}}';
+    document.head.appendChild(style);
+  }
+  ensureLiveRoomPlayerStyles();
+
   function hasListenerAccount() {
     var service = window.MelationCommunity;
     var adminUnlocked = false;
@@ -343,6 +352,8 @@
     shuffleButton.disabled = isLiveRoom();
     repeatButton.disabled = isLiveRoom();
     queueButton.disabled = isLiveRoom();
+    seek.disabled = isLiveRoom();
+    seek.setAttribute('aria-label', isLiveRoom() ? 'Live playback position — seeking is unavailable' : 'Seek through track');
     if (isLiveRoom()) { queuePanel.hidden = true; queueButton.setAttribute('aria-expanded', 'false'); }
     prev.classList.toggle('disabled', disabled);
     next.classList.toggle('disabled', disabled);
@@ -541,8 +552,14 @@
     saveState();
   });
   volumeTrack.addEventListener('pointercancel', function () { volumeDragging = false; });
-  seek.addEventListener('input', function () { seeking = true; updateSeekFill(seek.value); if (audio.duration) current.textContent = formatTime((seek.value / 100) * audio.duration); });
-  seek.addEventListener('change', function () { if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration; seeking = false; saveState(); });
+  seek.addEventListener('input', function () {
+    if (isLiveRoom()) { seeking = false; if (audio.duration) { var livePct = (audio.currentTime / audio.duration) * 100; seek.value = livePct; updateSeekFill(livePct); current.textContent = formatTime(audio.currentTime); } return; }
+    seeking = true; updateSeekFill(seek.value); if (audio.duration) current.textContent = formatTime((seek.value / 100) * audio.duration);
+  });
+  seek.addEventListener('change', function () {
+    if (isLiveRoom()) { seeking = false; if (audio.duration) { var livePct = (audio.currentTime / audio.duration) * 100; seek.value = livePct; updateSeekFill(livePct); current.textContent = formatTime(audio.currentTime); } return; }
+    if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration; seeking = false; saveState();
+  });
   audio.addEventListener('timeupdate', function () { if (!seeking && audio.duration) { var pct = (audio.currentTime / audio.duration) * 100; seek.value = pct; updateSeekFill(pct); current.textContent = formatTime(audio.currentTime); } if (window.MelationCommunity && currentIndex >= 0 && !audio.paused && audio.currentTime - communityLastReportedTime >= 10) { var listenedSeconds = audio.currentTime - communityLastReportedTime; communityLastReportedTime = audio.currentTime; window.MelationCommunity.recordListen(tracks[currentIndex].id, listenedSeconds); } });
   audio.addEventListener('loadedmetadata', function () { duration.textContent = formatTime(audio.duration); });
   audio.addEventListener('play', function () { if (currentIndex >= 0 && communityPlayedFor !== tracks[currentIndex].id) { communityPlayedFor = tracks[currentIndex].id; if (window.MelationCommunity) window.MelationCommunity.recordPlay(tracks[currentIndex].id); } updateButtons(); saveState(); });
