@@ -11,6 +11,12 @@
         { id:'02', name: 'Nightmare Fuel', artist: 'Osama, MT and Adam', src: 'albums/a-broken-dream/assets/Nightmare Fuel.MP3', art: 'albums/a-broken-dream/assets/Nightmare Fuel.png', page: 'songs/song.html?track=02' },
         { id:'11', name: "Nawaf's Stole Pain", artist: 'Bassam', src: "albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", art: "albums/a-broken-dream/assets/Nawaf's Stole Pain.png", page: 'songs/song.html?track=11', exclusive: true }
       ];
+  var ALL_TRACKS = [
+    { id:'01', name:'A Dreams A Mystery', artist:'Osama, MT', src:'albums/a-broken-dream/assets/a-dreams-a-mystery.mp3', art:'albums/a-broken-dream/assets/album-cover.png', page:'songs/song.html?track=01' },
+    { id:'02', name:'Nightmare Fuel', artist:'Osama, MT and Adam', src:'albums/a-broken-dream/assets/Nightmare Fuel.MP3', art:'albums/a-broken-dream/assets/Nightmare Fuel.png', page:'songs/song.html?track=02' },
+    { id:'11', name:"Nawaf's Stole Pain", artist:'Bassam', src:"albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", art:"albums/a-broken-dream/assets/Nawaf's Stole Pain.png", page:'songs/song.html?track=11', exclusive:true },
+    { id:'10-20', name:'10:20', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' }
+  ];
   var PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   var PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
   var PREV = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 6L9 12l11 6z"/></svg>';
@@ -177,6 +183,7 @@
       if (row) row.classList.toggle('is-playing', isPlaying);
       if (tracks[index]) button.setAttribute('aria-label', isPlaying ? 'Pause ' + tracks[index].name : 'Play ' + tracks[index].name);
     });
+    window.dispatchEvent(new CustomEvent('melation:playerstate', { detail: { playing: !audio.paused && currentIndex >= 0, track: currentIndex >= 0 ? tracks[currentIndex] : null } }));
   }
   function updateNavState() {
     var disabled = tracks.length <= 1;
@@ -239,6 +246,23 @@
     updateNavState();
     updateButtons();
     renderQueue();
+    return true;
+  };
+  window.melationPlayerIsPlaying = function () { return !audio.paused && currentIndex >= 0; };
+  window.melationPausePlayer = function () { audio.pause(); };
+  window.melationSetShuffle = function (value) { shuffle = !!value; updateModes(); saveState(); };
+  window.melationPlayAllShuffled = function () {
+    if (!requireListenerAccount()) return false;
+    tracks = ALL_TRACKS.map(function (track) { return Object.assign({}, track); });
+    currentIndex = -1;
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+    shuffle = true;
+    updateModes();
+    renderQueue();
+    updateNavState();
+    loadTrack(Math.floor(Math.random() * tracks.length), true);
     return true;
   };
 
