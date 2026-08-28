@@ -56,22 +56,26 @@ function syncLivePlayer(room) { if (window.melationUpdateLiveRoom) window.melati
 function ensureLiveStatus() { let element=document.getElementById('roomsLiveStatus'); if (element) return element; const heading=document.querySelector('.rooms-section-head'); if (!heading) return null; element=document.createElement('p'); element.id='roomsLiveStatus'; element.className='rooms-live-status'; element.setAttribute('role','status'); element.setAttribute('aria-live','polite'); heading.insertAdjacentElement('afterend',element); return element; }
 function setStatus(message, isError=false) { const element = document.getElementById('roomStatus'); if (element) element.textContent = message; const live=ensureLiveStatus(); if (live) { live.textContent=message||''; live.classList.toggle('is-error',!!isError); } }
 function ensureHostRailStyles() { if (document.getElementById('roomHostRailStyles')) return; const style=document.createElement('style'); style.id='roomHostRailStyles'; style.textContent='.room-card-top{position:relative!important;min-height:20px!important;padding-top:0!important}.room-listeners{position:absolute!important;top:2px!important;right:0!important;text-align:right!important}.room-live-badge{top:0!important;left:0!important}.room-host-open-button{margin-left:auto;min-height:38px;padding:0 15px;border:1px solid #1979c9;background:#071624;color:#92cbff;font:700 10px/1 "Space Mono",monospace;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}.room-host-open-button:hover,.room-host-open-button:focus-visible{background:#0c2942;color:#fff;outline:none}@media (max-width:640px){.rooms-command-bar{align-items:flex-start!important;gap:12px!important}.room-host-open-button{min-height:36px;padding:0 11px;font-size:9px}}@media (min-width:1024px){.rooms-stage.has-host-panel{display:block!important}.rooms-stage.has-host-panel .rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.room-host-panel{position:fixed!important;left:18px!important;top:120px!important;bottom:132px!important;width:282px!important;min-height:320px!important;max-height:none!important;box-sizing:border-box!important;overflow-y:auto!important;z-index:350!important}.room-host-panel h3{font-size:30px!important}.room-host-panel-meta{font-size:8px!important}.room-host-viewer{padding:10px!important}.room-host-panel-note{font-size:8px!important}}'; document.head.appendChild(style); }
+function ensureHostRailPosition() { if (document.getElementById('roomHostRailPosition')) return; const style=document.createElement('style'); style.id='roomHostRailPosition'; style.textContent='@media (min-width:1024px){.room-host-panel{position:fixed!important;left:0!important;top:112px!important;bottom:132px!important;width:282px!important;min-height:320px!important;max-height:none!important;box-sizing:border-box!important;overflow-y:auto!important;z-index:350!important}}'; document.head.appendChild(style); }
 
 function ensureHostPanel() {
   const list = document.getElementById('roomsList'); if (!list) return null;
   let stage = document.getElementById('roomsStage');
   if (!stage) { stage=document.createElement('div'); stage.id='roomsStage'; stage.className='rooms-stage'; list.parentNode.insertBefore(stage,list); stage.appendChild(list); }
   let panel = document.getElementById('roomHostPanel');
-  if (!panel) { panel=document.createElement('aside'); panel.id='roomHostPanel'; panel.className='room-host-panel'; panel.hidden=true; stage.insertBefore(panel,list); }
+  if (!panel) { panel=document.createElement('aside'); panel.id='roomHostPanel'; panel.className='room-host-panel'; panel.hidden=true; }
+  if (panel.parentElement !== document.body) document.body.appendChild(panel);
   return panel;
 }
 function renderHostPanel(rooms) {
   ensureHostRailStyles();
+  ensureHostRailPosition();
   const panel=ensureHostPanel(); if (!panel) return;
   const room=rooms.find(isOwner);
-  const stage=panel.parentElement;
-  if (!room) { panel.hidden=true; stage.classList.remove('has-host-panel'); return; }
-  const viewers=viewerEntries(room); panel.hidden=false; stage.classList.add('has-host-panel');
+  const stage=document.getElementById('roomsStage');
+  if (stage) stage.classList.remove('has-host-panel');
+  if (!room) { panel.hidden=true; return; }
+  const viewers=viewerEntries(room); panel.hidden=false;
   panel.innerHTML='<p class="label-kicker">Host controls</p><h3>'+escapeHtml(room.name)+'</h3><p class="room-host-panel-meta">'+viewers.length+' of '+roomCapacity(room)+' listeners · live room</p><div class="room-host-viewer-list">'+(viewers.length ? viewers.map(viewer=>'<div class="room-host-viewer"><span><strong>'+escapeHtml(viewer.viewerName||'Listener')+'</strong><small>Listening now</small></span>'+(viewer.id===presenceId?'<em>You</em>':'<button type="button" data-room-kick="'+escapeHtml(room.id)+'" data-viewer-id="'+escapeHtml(viewer.id)+'" data-viewer-name="'+escapeHtml(viewer.viewerName||'Listener')+'">Kick</button>')+'</div>').join(''):'<p class="room-host-empty">No listeners are in your room yet.</p>')+'</div><p class="room-host-panel-note">Kicked listeners are removed from this live session.</p>';
   panel.querySelectorAll('[data-room-kick]').forEach(button=>button.addEventListener('click',()=>kickViewer(button.dataset.roomKick,button.dataset.viewerId,button.dataset.viewerName)));
 }

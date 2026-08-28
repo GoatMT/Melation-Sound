@@ -20,8 +20,8 @@
   .site-search-results{max-height:min(360px,calc(100dvh - 120px))}
   .site-more-panel{top:62px!important;right:10px!important;left:10px!important;width:auto!important;max-height:calc(100dvh - 78px);overflow:auto}
 
-  /* Keep the quick mix in its top-right corner without covering the search bar. */
-  .site-quick-mix{top:8px!important;right:10px!important}
+  /* Listening Rooms host tools and the quick mix stay desktop-only. */
+  .site-quick-mix,.room-host-panel{display:none!important}
   .site-quick-mix-button{width:44px;min-width:44px;height:44px;padding:2px!important;justify-content:center}
   .site-quick-mix-button>span:last-child{display:none}
   .site-quick-mix-icon{width:38px!important;height:38px!important;flex-basis:38px!important}
