@@ -56,4 +56,3 @@
   if (button) button.setAttribute('aria-label', 'Search Melation Sound');
   document.addEventListener('click', function (event) { if (!form.contains(event.target)) closeResults(); });
 }());
-

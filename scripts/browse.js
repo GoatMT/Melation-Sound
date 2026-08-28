@@ -24,16 +24,10 @@ function renderCard(profile) {
   const disliked = profile.reactions.filter(item => item.type === 'dislike').map(item => songFor(item.songId));
   const displayName = profile.displayName || profile.username || profile.uid;
   const playlistName = String(profile.playlist?.name || displayName + "'s Playlist").slice(0, 50);
-<<<<<<< HEAD
   return '<article class="browse-card"><header class="browse-card-head"><span class="browse-avatar" aria-hidden="true">' + escapeHtml(initials(displayName)) + '</span><div><h2>' + escapeHtml(displayName) + '</h2><p class="browse-handle">@' + escapeHtml(profile.username || profile.uid) + '</p></div><div class="browse-card-actions"><a href="playlist.html?uid=' + encodeURIComponent(profile.uid) + '">Playlist</a><a href="profile.html?uid=' + encodeURIComponent(profile.uid) + '">Profile</a><button type="button" data-copy-url="playlist.html?uid=' + encodeURIComponent(profile.uid) + '">Copy link</button></div></header><div class="browse-card-body"><section class="browse-section"><h3>' + escapeHtml(playlistName) + '</h3><p class="browse-section-meta">' + playlistIds.length + ' tracks · ' + formatDuration(playlistDuration(playlistIds)) + '</p>' + renderList(playlistIds.map(songFor), 'Playlist', 'This playlist is empty.') + '</section><section class="browse-section"><h3>Reactions.</h3><p class="browse-section-meta">' + liked.length + ' liked · ' + disliked.length + ' disliked</p>' + renderList(liked, 'Liked', 'No liked tracks yet.') + renderList(disliked, 'Disliked', 'No disliked tracks yet.') + '</section></div></article>';
 }
 function setState(message, error = false) { const element = document.getElementById('browseState'); if (element) { element.textContent = message; element.classList.toggle('browse-error', error); } }
 function bindCopyLinks() { document.querySelectorAll('[data-copy-url]').forEach(button => button.addEventListener('click', async () => { const url = new URL(button.dataset.copyUrl, location.href); try { await navigator.clipboard.writeText(url.href); button.textContent = 'Copied'; } catch (error) { button.textContent = url.href; } setTimeout(() => { button.textContent = 'Copy link'; }, 1800); })); }
-=======
-  return '<article class="browse-card"><header class="browse-card-head"><span class="browse-avatar" aria-hidden="true">' + escapeHtml(initials(displayName)) + '</span><div><h2>' + escapeHtml(displayName) + '</h2><p class="browse-handle">@' + escapeHtml(profile.username || profile.uid) + '</p></div><div class="browse-card-actions"><a href="playlist.html?uid=' + encodeURIComponent(profile.uid) + '">Playlist</a><a href="profile.html?uid=' + encodeURIComponent(profile.uid) + '">Profile</a></div></header><div class="browse-card-body"><section class="browse-section"><h3>' + escapeHtml(playlistName) + '</h3><p class="browse-section-meta">' + playlistIds.length + ' tracks · ' + formatDuration(playlistDuration(playlistIds)) + '</p>' + renderList(playlistIds.map(songFor), 'Playlist', 'This playlist is empty.') + '</section><section class="browse-section"><h3>Reactions.</h3><p class="browse-section-meta">' + liked.length + ' liked · ' + disliked.length + ' disliked</p>' + renderList(liked, 'Liked', 'No liked tracks yet.') + renderList(disliked, 'Disliked', 'No disliked tracks yet.') + '</section></div></article>';
-}
-function setState(message, error = false) { const element = document.getElementById('browseState'); if (element) { element.textContent = message; element.classList.toggle('browse-error', error); } }
->>>>>>> a9a0613323984d442d6daa4717629e94e2d71b23
 
 async function loadProfiles() {
   if (!config.apiKey || !config.projectId || !config.appId) { setState('Firebase is not configured. Public listener collections will appear after Firebase is connected.'); return []; }
@@ -54,10 +48,7 @@ async function start() {
     const target = document.getElementById('browseGrid');
     if (!target) return;
     target.innerHTML = profiles.length ? profiles.map(renderCard).join('') : '<p class="browse-empty-state">No other public listener collections are available yet. Create an account, build a playlist, and your public collection can appear here.</p>';
-<<<<<<< HEAD
     bindCopyLinks();
-=======
->>>>>>> a9a0613323984d442d6daa4717629e94e2d71b23
     if (profiles.length) setState(profiles.length + ' public listener ' + (profiles.length === 1 ? 'collection' : 'collections'));
   } catch (error) {
     setState('Public listener collections are temporarily unavailable. Check the Firestore rules and try again.', true);
@@ -65,7 +56,3 @@ async function start() {
 }
 
 start();
-<<<<<<< HEAD
-=======
-
->>>>>>> a9a0613323984d442d6daa4717629e94e2d71b23
