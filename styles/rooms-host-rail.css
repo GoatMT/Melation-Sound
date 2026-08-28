@@ -1,0 +1,9 @@
+@media(min-width:1281px){
+  .rooms-stage.has-host-panel{display:block}
+  .rooms-stage.has-host-panel .rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .room-host-panel{position:fixed;left:clamp(12px,2vw,34px);top:120px;width:min(278px,15vw);max-height:calc(100vh - 150px);overflow:auto;z-index:160}
+  .room-host-panel h3{font-size:30px}
+  .room-host-panel-meta{font-size:8px}
+  .room-host-viewer{padding:10px}
+  .room-host-panel-note{font-size:8px}
+}

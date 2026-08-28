@@ -64,6 +64,7 @@
   }
 
   function init() {
+    if (!document.querySelector('link[href*="rooms-host-rail.css"]')) { var hostRailStyles = document.createElement('link'); hostRailStyles.rel = 'stylesheet'; hostRailStyles.href = 'styles/rooms-host-rail.css?v=20260828-1'; document.head.appendChild(hostRailStyles); }
     var nav = document.querySelector('.label-links, .nav-links');
     var path = window.location.pathname.toLowerCase();
     var isReleaseMiniSite = path.indexOf('/albums/a-broken-dream/') !== -1 || path.indexOf('/singles/10-20/') !== -1;
