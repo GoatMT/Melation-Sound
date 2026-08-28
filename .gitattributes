@@ -1,0 +1,9 @@
+# Keep web source files normalized in Git across Windows and macOS/Linux.
+* text=auto
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.webmanifest text eol=lf
+*.rules text eol=lf
+*.md text eol=lf
