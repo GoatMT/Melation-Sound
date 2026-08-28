@@ -178,7 +178,7 @@ footer.site-footer{position:relative;z-index:1;padding:30px 0 38px;border-top:1p
 @media(max-width:700px){
   .wrap{padding:0 18px}
   nav.site-nav{align-items:flex-start;flex-wrap:wrap;padding:16px 0}
-  .nav-links{width:100%;justify-content:flex-start;gap:8px;overflow-x:auto;white-space:nowrap}
+  .nav-links{width:100%;justify-content:flex-end;gap:8px;overflow-x:auto;white-space:nowrap}
   .nav-links a{padding:10px 12px}
   .page-main{padding:52px 0 80px}
   .bio-grid{grid-template-columns:1fr}

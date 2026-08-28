@@ -80,10 +80,13 @@
   var communityLastReportedTime = 0;
   var STATE_KEY = 'melationPlayerState';
   var accountGate = null;
+  var navigationResumeIntent = false;
 
   function hasListenerAccount() {
     var service = window.MelationCommunity;
-    return !!(service && typeof service.user === 'function' && service.user());
+    var adminUnlocked = false;
+    try { adminUnlocked = sessionStorage.getItem('melationAdminUnlocked') === 'yes'; } catch (e) {}
+    return adminUnlocked || !!(service && typeof service.user === 'function' && service.user());
   }
   function closeAccountGate() {
     if (!accountGate) return;
@@ -99,7 +102,7 @@
       accountGate.setAttribute('role', 'dialog');
       accountGate.setAttribute('aria-modal', 'true');
       accountGate.setAttribute('aria-labelledby', 'labelAccountGateTitle');
-      accountGate.innerHTML = '<div class="label-account-gate-card"><button type="button" class="label-account-gate-close" data-account-gate-close aria-label="Close account prompt">✕</button><p class="label-account-gate-kicker">Melation Sound · listener access</p><h2 id="labelAccountGateTitle">Make an account to listen.</h2><p>Create a free account or sign in before streaming songs, saving listening history, liking tracks, disliking tracks, or commenting.</p><div class="label-account-gate-actions"><a class="label-account-gate-primary" href="community.html">Go to Account</a><button type="button" class="label-account-gate-secondary" data-account-gate-close>Keep browsing</button></div></div>';
+      accountGate.innerHTML = '<div class="label-account-gate-card"><button type="button" class="label-account-gate-close" data-account-gate-close aria-label="Close account prompt">✕</button><p class="label-account-gate-kicker">Melation Sound · listener access</p><h2 id="labelAccountGateTitle">Make an account to listen.</h2><p>Create a free account or sign in before streaming songs, saving listening history, liking tracks, disliking tracks, or commenting.</p><div class="label-account-gate-actions"><div class="label-account-gate-main-actions"><a class="label-account-gate-primary" href="community.html">Go to Account</a><button type="button" class="label-account-gate-secondary" data-account-gate-close>Keep browsing</button></div><a class="label-account-gate-admin" href="admin-login.html">I\'m An Admin</a></div></div>';
       document.body.appendChild(accountGate);
       accountGate.querySelectorAll('[data-account-gate-close]').forEach(function (button) { button.addEventListener('click', closeAccountGate); });
       accountGate.addEventListener('click', function (event) { if (event.target === accountGate) closeAccountGate(); });
@@ -118,10 +121,22 @@
   function readState() {
     try { return JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); } catch (e) { return null; }
   }
-  function saveState() {
-    if (currentIndex < 0) return;
+  function saveState(playingOverride) {
     try {
-      localStorage.setItem(STATE_KEY, JSON.stringify({ src: tracks[currentIndex].src, currentTime: audio.currentTime || 0, volume: volume, muted: muted, shuffle: shuffle, repeat: repeat, open: player.classList.contains('open') }));
+      var state = readState() || {};
+      state.volume = volume;
+      state.muted = muted;
+      state.shuffle = shuffle;
+      state.repeat = repeat;
+      if (currentIndex >= 0) {
+        state.src = tracks[currentIndex].src;
+        state.currentTime = audio.currentTime || 0;
+        state.playing = typeof playingOverride === 'boolean' ? playingOverride : !audio.paused;
+        state.open = player.classList.contains('open');
+        state.updatedAtMs = Date.now();
+        state.queue = tracks.map(function (track) { return { id:track.id, name:track.name, artist:track.artist, src:track.src, art:track.art, page:track.page, exclusive:!!track.exclusive }; });
+      }
+      localStorage.setItem(STATE_KEY, JSON.stringify(state));
     } catch (e) {}
   }
   function formatTime(seconds) {
@@ -183,7 +198,7 @@
       if (row) row.classList.toggle('is-playing', isPlaying);
       if (tracks[index]) button.setAttribute('aria-label', isPlaying ? 'Pause ' + tracks[index].name : 'Play ' + tracks[index].name);
     });
-    window.dispatchEvent(new CustomEvent('melation:playerstate', { detail: { playing: !audio.paused && currentIndex >= 0, track: currentIndex >= 0 ? tracks[currentIndex] : null } }));
+    window.dispatchEvent(new CustomEvent('melation:playerstate', { detail: { playing: !audio.paused && currentIndex >= 0, hasTrack: currentIndex >= 0, track: currentIndex >= 0 ? tracks[currentIndex] : null } }));
   }
   function updateNavState() {
     var disabled = tracks.length <= 1;
@@ -197,7 +212,7 @@
     audio.src = tracks[0].src;
     audio.load();
   };
-  function loadTrack(index, autoplay) {
+  function loadTrack(index, autoplay, preserveSavedPlayback) {
     if (!tracks[index]) return;
     if (autoplay && !requireListenerAccount()) return;
     currentIndex = index;
@@ -225,7 +240,7 @@
     updateNavState();
     renderQueue();
     if (autoplay) audio.play().catch(function () {});
-    saveState();
+    if (!preserveSavedPlayback) saveState();
   }
   window.melationPlayTrack = function (index) {
     if (!tracks[index]) return;
@@ -249,7 +264,9 @@
     return true;
   };
   window.melationPlayerIsPlaying = function () { return !audio.paused && currentIndex >= 0; };
+  window.melationPlayerHasTrack = function () { return currentIndex >= 0; };
   window.melationPausePlayer = function () { audio.pause(); };
+  window.melationResumePlayer = function () { if (!requireListenerAccount()) return false; if (currentIndex < 0) return window.melationPlayAllShuffled(); audio.play().catch(function () {}); return true; };
   window.melationSetShuffle = function (value) { shuffle = !!value; updateModes(); saveState(); };
   window.melationPlayAllShuffled = function () {
     if (!requireListenerAccount()) return false;
@@ -309,10 +326,25 @@
   seek.addEventListener('change', function () { if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration; seeking = false; saveState(); });
   audio.addEventListener('timeupdate', function () { if (!seeking && audio.duration) { var pct = (audio.currentTime / audio.duration) * 100; seek.value = pct; updateSeekFill(pct); current.textContent = formatTime(audio.currentTime); } if (window.MelationCommunity && currentIndex >= 0 && !audio.paused && audio.currentTime - communityLastReportedTime >= 10) { var listenedSeconds = audio.currentTime - communityLastReportedTime; communityLastReportedTime = audio.currentTime; window.MelationCommunity.recordListen(tracks[currentIndex].id, listenedSeconds); } });
   audio.addEventListener('loadedmetadata', function () { duration.textContent = formatTime(audio.duration); });
-  audio.addEventListener('play', function () { if (currentIndex >= 0 && communityPlayedFor !== tracks[currentIndex].id) { communityPlayedFor = tracks[currentIndex].id; if (window.MelationCommunity) window.MelationCommunity.recordPlay(tracks[currentIndex].id); } updateButtons(); });
-  audio.addEventListener('pause', function () { updateButtons(); saveState(); });
+  audio.addEventListener('play', function () { if (currentIndex >= 0 && communityPlayedFor !== tracks[currentIndex].id) { communityPlayedFor = tracks[currentIndex].id; if (window.MelationCommunity) window.MelationCommunity.recordPlay(tracks[currentIndex].id); } updateButtons(); saveState(); });
+  audio.addEventListener('pause', function () { updateButtons(); saveState(navigationResumeIntent ? true : undefined); });
   audio.addEventListener('ended', function () { if (repeat && currentIndex >= 0) loadTrack(currentIndex, true); else if (tracks.length > 1) loadTrack(nextTrackIndex(1), true); else { audio.currentTime = 0; updateButtons(); } });
-  window.addEventListener('pagehide', saveState);
+  document.addEventListener('click', function (event) {
+    if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    var link = event.target.closest && event.target.closest('a[href]');
+    if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+    var href = link.getAttribute('href') || '';
+    if (!href || href.charAt(0) === '#') return;
+    if (currentIndex >= 0 && !audio.paused) {
+      navigationResumeIntent = true;
+      saveState(true);
+    }
+  }, true);
+  window.addEventListener('beforeunload', function () {
+    if (currentIndex >= 0 && !audio.paused) navigationResumeIntent = true;
+    saveState(navigationResumeIntent ? true : undefined);
+  });
+  window.addEventListener('pagehide', function () { saveState(navigationResumeIntent ? true : undefined); });
   updateVolume();
   updateModes();
   renderQueue();
@@ -336,17 +368,31 @@
   }
 
   var saved = readState();
+  if (saved) {
+    volume = typeof saved.volume === 'number' ? saved.volume : volume;
+    muted = !!saved.muted;
+    shuffle = !!saved.shuffle;
+    repeat = !!saved.repeat;
+    updateVolume();
+    updateModes();
+  }
   if (saved && saved.open && !privateReleaseLocked) {
+    var shouldResume = !!saved.playing;
+    if (Array.isArray(saved.queue) && saved.queue.length) tracks = saved.queue.map(function (track) { return { id:track.id, name:track.name, artist:track.artist, src:track.src, art:track.art, page:track.page, exclusive:!!track.exclusive }; });
     var savedIndex = tracks.findIndex(function (track) { return track.src === saved.src; });
     if (savedIndex >= 0) {
-      volume = typeof saved.volume === 'number' ? saved.volume : 1;
-      muted = !!saved.muted;
-      shuffle = !!saved.shuffle;
-      repeat = !!saved.repeat;
-      updateVolume();
-      updateModes();
-      loadTrack(savedIndex, false);
+      loadTrack(savedIndex, false, true);
       audio.addEventListener('loadedmetadata', function () { if (saved.currentTime && audio.duration) audio.currentTime = Math.min(saved.currentTime, audio.duration); }, { once: true });
+      if (shouldResume) {
+        var resumeSavedTrack = function () {
+          audio.play().catch(function () {
+            var resumeOnGesture = function () { audio.play().catch(function () {}); };
+            document.addEventListener('pointerdown', resumeOnGesture, { once: true, capture: true });
+            document.addEventListener('keydown', resumeOnGesture, { once: true, capture: true });
+          });
+        };
+        if (audio.readyState >= 2) resumeSavedTrack(); else audio.addEventListener('canplay', resumeSavedTrack, { once: true });
+      }
     }
   } else if (!saved && !privateReleaseLocked) {
     var initialIndex = parseInt(mount.getAttribute('data-label-start') || '0', 10);

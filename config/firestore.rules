@@ -44,6 +44,24 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      match /rooms/{roomId} {
+        allow read: if true;
+        allow create, update: if request.resource.data.keys().hasAll([
+          "id", "name", "host", "ownerKey", "trackIds", "currentIndex", "active", "createdAtMs", "updatedAtMs"
+        ]) && request.resource.data.name is string
+          && request.resource.data.trackIds is list
+          && request.resource.data.active is bool;
+        allow delete: if false;
+
+        match /presence/{presenceId} {
+          allow read: if true;
+          allow create, update: if request.resource.data.keys().hasAll(["joinedAtMs", "lastSeenMs"])
+            && request.resource.data.joinedAtMs is number
+            && request.resource.data.lastSeenMs is number;
+          allow delete: if true;
+        }
+      }
+
       match /songComments/{songId}/comments/{commentId} {
         allow read: if true;
         allow create: if request.resource.data.keys().hasAll([
@@ -52,6 +70,23 @@ service cloud.firestore {
           && request.resource.data.body.size() > 0
           && request.resource.data.body.size() <= 500;
         allow update, delete: if false;
+      }
+
+      // Download keys are stored by SHA-256 hash; the raw 13-digit key is not
+      // written to Firestore. This client-only admin model is a convenience
+      // gate, not secure payment DRM. Use Firebase Auth + a trusted backend
+      // before relying on it for protected sales.
+      match /downloadKeys/{keyHash} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasAll([
+          "songId", "songTitle", "keyLast4", "active", "uses", "createdAtMs", "updatedAtMs"
+        ]) && request.resource.data.songId is string
+          && request.resource.data.keyLast4 is string
+          && request.resource.data.keyLast4.size() == 4
+          && request.resource.data.active is bool;
+        allow update: if request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(["active", "uses", "lastUsedAtMs", "updatedAtMs"]);
+        allow delete: if true;
       }
     }
   }

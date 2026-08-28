@@ -22,7 +22,8 @@
     { title: 'Browse', meta: 'Melation Sound · public listener collections', action: 'Browse playlists and reactions', href: 'browse.html', terms: 'browse public playlists liked disliked reactions listeners' },
     { title: 'Playlist', meta: 'Melation Sound · listener collection', action: 'Open playlist', href: 'playlist.html', terms: 'playlist tracks play reorder share' },
     { title: 'Achievements', meta: 'Melation Sound · listener milestones', action: 'View achievements', href: 'achievements.html', terms: 'achievements milestones streaks' },
-    { title: 'Updates', meta: 'Melation Sound · release log', action: 'View updates', href: 'updates.html', terms: 'updates news releases new music' }
+    { title: 'Updates', meta: 'Melation Sound · release log', action: 'View updates', href: 'updates.html', terms: 'updates news releases new music' },
+    { title: 'Admin Login', meta: 'Melation Sound · restricted access', action: 'Open admin login', href: 'admin-login.html', terms: 'admin owner login restricted settings' }
   ];
 
   function escapeHtml(value) {

@@ -1,5 +1,6 @@
 (function () {
   if (!document.querySelector('link[href*="site-shell.css"]')) { var shellStyles = document.createElement('link'); shellStyles.rel = 'stylesheet'; shellStyles.href = 'styles/site-shell.css?v=20260828-1'; document.head.appendChild(shellStyles); }
+  if (!document.querySelector('link[href*="account-gate.css?v=20260828"]')) { var gateStyles = document.createElement('link'); gateStyles.rel = 'stylesheet'; gateStyles.href = 'styles/account-gate.css?v=20260828-2'; document.head.appendChild(gateStyles); }
   if (!document.querySelector('script[src*="site-shell.js"]')) { var shellScript = document.createElement('script'); shellScript.src = 'scripts/site-shell.js?v=20260828-1'; document.body.appendChild(shellScript); }
   if (document.querySelector('[data-timeline-filter]') && !document.querySelector('script[src*="timeline.js"]')) { var timelineScript = document.createElement('script'); timelineScript.src = 'scripts/timeline.js?v=20260828-1'; document.body.appendChild(timelineScript); }
   if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('service-worker.js').catch(function () {}); });

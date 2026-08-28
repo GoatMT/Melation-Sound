@@ -9,7 +9,7 @@ body.label-page::after{background:radial-gradient(ellipse at center,transparent 
 .label-brand img{width:46px;height:46px;object-fit:cover;border:1px solid #21558a;box-shadow:0 0 24px rgba(22,135,255,.3)}
 .label-brand-name{font:28px 'Bebas Neue',sans-serif;letter-spacing:.12em}
 .label-brand-name span{color:var(--label-blue-soft)}
-.label-links{display:flex;align-items:center;gap:12px;font:13px 'Space Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
+.label-links{display:flex;align-items:center;gap:12px;margin-left:auto;font:13px 'Space Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
 .label-links a{padding:12px 15px;color:var(--label-muted);text-decoration:none;border:1px solid transparent;border-radius:2px;transition:color .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease}
 .label-home .label-links a{opacity:0;animation:label-fade-up .55s ease forwards}
 .label-home .label-links a:nth-child(1){animation-delay:.18s}.label-home .label-links a:nth-child(2){animation-delay:.27s}.label-home .label-links a:nth-child(3){animation-delay:.36s}
@@ -194,7 +194,7 @@ body.has-label-player{padding-bottom:calc(116px + env(safe-area-inset-bottom))}
 @keyframes artist-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:700px){
   .label-nav{align-items:flex-start;flex-wrap:wrap;padding:16px 0}
-  .label-links{width:100%;justify-content:flex-start;gap:4px;overflow-x:auto;white-space:nowrap}
+  .label-links{width:100%;margin-left:0;justify-content:flex-end;gap:4px;overflow-x:auto;white-space:nowrap}
   .label-links a{padding:10px 12px}
   .label-hero{min-height:0;grid-template-columns:1fr;gap:42px;padding:58px 0 72px}
   .label-logo-large{width:220px;height:220px}

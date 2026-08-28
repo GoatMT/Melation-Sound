@@ -1,6 +1,3 @@
-import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-
 const config = window.MELATION_FIREBASE_CONFIG || {};
 const ROOT = 'melationSound';
 const ROOT_ID = 'main';
@@ -9,16 +6,36 @@ const SESSION_KEY = 'melationAdminUnlocked';
 let db = null;
 let accounts = null;
 let songs = null;
+let initializeApp = null;
+let getApps = null;
+let getFirestore = null;
+let doc = null;
+let getDoc = null;
+let setDoc = null;
+let deleteDoc = null;
+let collection = null;
+let getDocs = null;
 
 function normalize(value) { return String(value || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function escape(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]); }
 function setStatus(id, value, error = false) { const target = document.getElementById(id); if (target) { target.textContent = value; target.classList.toggle('is-error', error); } }
-function hash(value) { return crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)).then(bytes => Array.from(new Uint8Array(bytes)).map(byte => byte.toString(16).padStart(2, '0')).join('')); }
+function hash(value) { return window.MelationAdminAuth ? window.MelationAdminAuth.hash(value) : Promise.reject(new Error('Admin authentication is unavailable.')); }
 function hashPin(usernameKey, pin) { return hash(usernameKey + ':' + pin); }
 function validUsername(value) { return /^[a-z0-9_-]{2,20}$/.test(normalize(value)); }
 function validPin(value) { return /^\d{6}$/.test(String(value || '')); }
 async function initFirestore() {
   if (!config.apiKey || !config.projectId || !config.appId) throw new Error('Firebase is not configured.');
+  const firebaseApp = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js');
+  const firebaseFirestore = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js');
+  initializeApp = firebaseApp.initializeApp;
+  getApps = firebaseApp.getApps;
+  getFirestore = firebaseFirestore.getFirestore;
+  doc = firebaseFirestore.doc;
+  getDoc = firebaseFirestore.getDoc;
+  setDoc = firebaseFirestore.setDoc;
+  deleteDoc = firebaseFirestore.deleteDoc;
+  collection = firebaseFirestore.collection;
+  getDocs = firebaseFirestore.getDocs;
   const app = getApps().find(item => item.name === 'adminTools') || initializeApp(config, 'adminTools');
   db = getFirestore(app);
   accounts = collection(db, ROOT, ROOT_ID, 'accounts');
@@ -101,8 +118,9 @@ function showTools() {
   document.getElementById('adminGate').hidden = true;
   const tools = document.getElementById('adminTools');
   tools.hidden = false;
-  tools.querySelectorAll('input, button').forEach(control => { control.disabled = false; });
+  tools.querySelectorAll('input, button, select').forEach(control => { control.disabled = false; });
   loadAnalytics();
+  window.dispatchEvent(new CustomEvent('melation:admin-unlocked'));
 }
 function bindGate() {
   const form = document.getElementById('adminGateForm');
