@@ -17,6 +17,7 @@
     { title: 'Charts', meta: 'Melation Sound · listeners and songs', action: 'View charts', href: 'charts.html', terms: 'charts views likes dislikes listeners' },
     { title: 'About', meta: 'Melation Sound · the label', action: 'About the label', href: 'about.html', terms: 'about label melation sound' },
     { title: 'Account', meta: 'Melation Sound · listener profiles', action: 'Open account', href: 'community.html', terms: 'account profile listener playlist' },
+    { title: 'Browse', meta: 'Melation Sound · public listener collections', action: 'Browse playlists and reactions', href: 'browse.html', terms: 'browse public playlists liked disliked reactions listeners' },
     { title: 'Playlist', meta: 'Melation Sound · listener collection', action: 'Open playlist', href: 'playlist.html', terms: 'playlist tracks play reorder share' },
     { title: 'Achievements', meta: 'Melation Sound · listener milestones', action: 'View achievements', href: 'achievements.html', terms: 'achievements milestones streaks' },
     { title: 'Updates', meta: 'Melation Sound · release log', action: 'View updates', href: 'updates.html', terms: 'updates news releases new music' }
@@ -55,3 +56,4 @@
   if (button) button.setAttribute('aria-label', 'Search Melation Sound');
   document.addEventListener('click', function (event) { if (!form.contains(event.target)) closeResults(); });
 }());
+
