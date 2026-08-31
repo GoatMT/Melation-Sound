@@ -3,20 +3,23 @@
   if (!mount) return;
 
   var privateReleasePage = document.body.classList.contains('private-single-page');
+  var ovoPage = document.body.classList.contains('ovo-page');
+  var ovoCatalog = ovoPage && Array.isArray(window.OVO_DRAKE_CATALOG) ? window.OVO_DRAKE_CATALOG : [];
   var privateReleaseLocked = privateReleasePage && document.body.classList.contains('private-locked');
   var tracks = privateReleasePage
     ? [{ id:'10-20', name: '10:20', artist: 'MT', src: 'singles/10-20/assets/MT - 1020.MP3', art: 'singles/10-20/assets/1020.png', page: 'songs/song.html?track=10-20', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' }]
-    : [
+    : (ovoPage && ovoCatalog.length ? ovoCatalog.map(function (track) { return Object.assign({}, track); }) : [
         { id:'01', name: 'A Dreams A Mystery', artist: 'Osama, MT', src: 'albums/a-broken-dream/assets/a-dreams-a-mystery.mp3', art: 'albums/a-broken-dream/assets/album-cover.png', page: 'songs/song.html?track=01' },
         { id:'02', name: 'Nightmare Fuel', artist: 'Osama, MT and Adam', src: 'albums/a-broken-dream/assets/Nightmare Fuel.MP3', art: 'albums/a-broken-dream/assets/Nightmare Fuel.png', page: 'songs/song.html?track=02' },
         { id:'11', name: "Nawaf's Stole Pain", artist: 'Bassam', src: "albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", art: "albums/a-broken-dream/assets/Nawaf's Stole Pain.png", page: 'songs/song.html?track=11', exclusive: true }
-      ];
+      ]);
   var ALL_TRACKS = [
     { id:'01', name:'A Dreams A Mystery', artist:'Osama, MT', src:'albums/a-broken-dream/assets/a-dreams-a-mystery.mp3', art:'albums/a-broken-dream/assets/album-cover.png', page:'songs/song.html?track=01' },
     { id:'02', name:'Nightmare Fuel', artist:'Osama, MT and Adam', src:'albums/a-broken-dream/assets/Nightmare Fuel.MP3', art:'albums/a-broken-dream/assets/Nightmare Fuel.png', page:'songs/song.html?track=02' },
     { id:'11', name:"Nawaf's Stole Pain", artist:'Bassam', src:"albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", art:"albums/a-broken-dream/assets/Nawaf's Stole Pain.png", page:'songs/song.html?track=11', exclusive:true },
     { id:'10-20', name:'10:20', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' }
   ];
+  function pageCatalog() { return ovoPage && ovoCatalog.length ? ovoCatalog : ALL_TRACKS; }
   var PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   var PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
   var PREV = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 6L9 12l11 6z"/></svg>';
@@ -92,9 +95,9 @@
   var shuffle = false;
   var repeat = false;
   var seeking = false;
-  var communityPlayedFor = '';
+  var communityPlayEligible = false;
   var communityLastReportedTime = 0;
-  var STATE_KEY = 'melationPlayerState';
+  var STATE_KEY = ovoPage ? 'melationOvoPlayerState' : 'melationPlayerState';
   var accountGate = null;
   var navigationResumeIntent = false;
   var liveRoom = null;
@@ -368,7 +371,7 @@
     if (autoplay && !requireListenerAccount()) return;
     currentIndex = index;
     var track = tracks[index];
-    communityPlayedFor = '';
+    communityPlayEligible = false;
     communityLastReportedTime = 0;
     var trackUrl = new URL(track.src, document.baseURI).href;
     if (audio.src !== trackUrl) audio.src = track.src;
@@ -408,7 +411,7 @@
     if (index < 0) {
       // A playlist may not contain the song whose own page was opened. Restore
       // the appropriate catalog queue so the page can always play its own song.
-      tracks = (privateReleasePage ? [{ id:'10-20', name:'10:20', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' }] : ALL_TRACKS)
+      tracks = (privateReleasePage ? [{ id:'10-20', name:'10:20', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' }] : pageCatalog())
         .map(function (track) { return Object.assign({}, track); });
       index = tracks.findIndex(function (track) { return track.id === trackId; });
       currentIndex = -1;
@@ -421,7 +424,7 @@
     if (index >= 0) window.melationPlayTrack(index);
   };
   window.melationSetQueue = function (queue) {
-    if (privateReleasePage || isLiveRoom() || !Array.isArray(queue) || !queue.length) return false;
+    if (privateReleasePage || ovoPage || isLiveRoom() || !Array.isArray(queue) || !queue.length) return false;
     tracks = queue.map(function (track) { return { id:track.id, name:track.name || track.title, artist:track.artist, src:track.src, art:track.art, page:track.page || track.href }; });
     currentIndex = -1;
     audio.pause();
@@ -473,7 +476,7 @@
   window.melationPlayAllShuffled = function () {
     if (isLiveRoom()) return false;
     if (!requireListenerAccount()) return false;
-    tracks = ALL_TRACKS.map(function (track) { return Object.assign({}, track); });
+    tracks = pageCatalog().map(function (track) { return Object.assign({}, track); });
     currentIndex = -1;
     audio.pause();
     audio.removeAttribute('src');
@@ -562,9 +565,9 @@
   });
   audio.addEventListener('timeupdate', function () { if (!seeking && audio.duration) { var pct = (audio.currentTime / audio.duration) * 100; seek.value = pct; updateSeekFill(pct); current.textContent = formatTime(audio.currentTime); } if (window.MelationCommunity && currentIndex >= 0 && !audio.paused && audio.currentTime - communityLastReportedTime >= 10) { var listenedSeconds = audio.currentTime - communityLastReportedTime; communityLastReportedTime = audio.currentTime; window.MelationCommunity.recordListen(tracks[currentIndex].id, listenedSeconds); } });
   audio.addEventListener('loadedmetadata', function () { duration.textContent = formatTime(audio.duration); });
-  audio.addEventListener('play', function () { if (currentIndex >= 0 && communityPlayedFor !== tracks[currentIndex].id) { communityPlayedFor = tracks[currentIndex].id; if (window.MelationCommunity) window.MelationCommunity.recordPlay(tracks[currentIndex].id); } updateButtons(); saveState(); });
+  audio.addEventListener('play', function () { if (currentIndex >= 0) communityPlayEligible = true; updateButtons(); saveState(); });
   audio.addEventListener('pause', function () { updateButtons(); saveState(navigationResumeIntent ? true : undefined); });
-  audio.addEventListener('ended', function () { if (repeat && currentIndex >= 0) loadTrack(currentIndex, true); else if (tracks.length > 1) loadTrack(nextTrackIndex(1), true); else { audio.currentTime = 0; updateButtons(); } });
+  audio.addEventListener('ended', function () { var finishedTrack = currentIndex >= 0 ? tracks[currentIndex] : null; if (finishedTrack && communityPlayEligible && window.MelationCommunity) window.MelationCommunity.recordPlay(finishedTrack.id); communityPlayEligible = false; if (repeat && currentIndex >= 0) loadTrack(currentIndex, true); else if (tracks.length > 1) loadTrack(nextTrackIndex(1), true); else { audio.currentTime = 0; updateButtons(); } });
   document.addEventListener('click', function (event) {
     if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     var link = event.target.closest && event.target.closest('a[href]');

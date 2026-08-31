@@ -75,7 +75,9 @@ service cloud.firestore {
           "id", "name", "host", "ownerKey", "trackIds", "currentIndex", "active", "createdAtMs", "updatedAtMs"
         ]) && request.resource.data.name is string
           && request.resource.data.trackIds is list
-          && request.resource.data.active is bool;
+          && request.resource.data.active is bool
+          && (!request.resource.data.keys().hasAny(["visibility"])
+            || request.resource.data.visibility in ["public", "private"]);
         allow delete: if false;
 
         match /presence/{presenceId} {

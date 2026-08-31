@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=20260828-1">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260828-1">
+<link rel="manifest" href="assets/site.webmanifest?v=20260828-2">
+<meta name="theme-color" content="#050505">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OVO · Melation Sound">
+<meta name="description" content="A private OVO and Drake listening catalog inside Melation Sound.">
+<title>OVO · Melation Sound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/label.css">
+<link rel="stylesheet" href="styles/site-motion.css?v=20260827-7">
+<link rel="stylesheet" href="styles/site-search.css?v=20260827-3">
+<link rel="stylesheet" href="styles/playlist.css?v=20260827-2">
+<link rel="stylesheet" href="styles/ovo.css?v=20260830-1">
+</head>
+<body class="label-page ovo-page ovo-locked">
+<section class="ovo-gate" id="ovoGate" aria-labelledby="ovoGateTitle">
+  <div class="ovo-gate-card">
+    <p class="label-kicker">Melation Sound · private catalog</p>
+    <h1 id="ovoGateTitle">OVO</h1>
+    <p class="ovo-gate-copy">This collection is private. Enter the password to open the OVO / Drake catalog.</p>
+    <form class="ovo-gate-form" id="ovoGateForm">
+      <label for="ovoGatePassword">Password</label>
+      <div class="ovo-gate-input-row"><input id="ovoGatePassword" name="password" type="password" autocomplete="current-password" required><button type="submit">Enter OVO</button></div>
+      <p class="ovo-gate-error" id="ovoGateError" role="alert" aria-live="polite"></p>
+    </form>
+    <p class="ovo-gate-note">Private access screen · streaming remains free after entry.</p>
+  </div>
+</section>
+<script>
+  (function () {
+    var gate = document.getElementById('ovoGate');
+    var form = document.getElementById('ovoGateForm');
+    var input = document.getElementById('ovoGatePassword');
+    var error = document.getElementById('ovoGateError');
+    var unlockedKey = 'melationOvoUnlocked';
+    var passwordHash = 'fcfd078f912f086bda4b4caa4cb792aafc28735c70f24d70e87978908cbdd2a3';
+    function hasAccess() { try { return sessionStorage.getItem(unlockedKey) === 'yes'; } catch (e) { return false; } }
+    function hash(value) {
+      if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+        return crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)).then(function (bytes) { return Array.from(new Uint8Array(bytes)).map(function (byte) { return byte.toString(16).padStart(2, '0'); }).join(''); });
+      }
+      return Promise.resolve('');
+    }
+    function unlock() {
+      document.body.classList.remove('ovo-locked');
+      gate.hidden = true;
+      try { sessionStorage.setItem(unlockedKey, 'yes'); } catch (e) {}
+    }
+    if (hasAccess()) unlock();
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      hash(input.value).then(function (value) {
+        if (value === passwordHash) { error.textContent = ''; unlock(); }
+        else { error.textContent = 'That password is not correct.'; input.select(); }
+      });
+    });
+  }());
+</script>
+<header class="label-header"><nav class="label-nav wrap" aria-label="Main navigation"><a class="label-brand" href="index.html" aria-label="Melation Sound home"><img src="assets/melation-sound.png" alt="Melation Sound M logo"><span class="label-brand-name">MELATION <span>SOUND</span></span></a><div class="label-links"><a href="ovo.html" aria-current="page">OVO</a><a href="artists.html">Artists</a><a href="timeline.html">Timeline</a><a href="charts.html">Charts</a><a href="community.html">Account</a><a href="about.html">About</a></div><form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off"><label class="sr-only" for="siteSearchInput">Search Melation Sound</label><input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false"><button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button><div class="site-search-results" id="siteSearchResults" role="listbox"></div></form></nav></header>
+<main class="label-main"><div class="wrap ovo-shell">
+  <p class="label-kicker">Melation Sound · private catalog</p>
+  <section class="ovo-hero" aria-labelledby="ovoTitle"><div class="ovo-art-frame"><span class="ovo-art-tag">Private archive</span><img src="ovo drake/ovo-cover.png" alt="OVO owl artwork"></div><div class="ovo-hero-copy"><h1 id="ovoTitle">OVO <span>Drake archive</span></h1><p class="ovo-hero-artist">Drake and collaborators</p><p>Browse the private collection by collaborator, then by song name. The audio stays isolated to this page and is not part of Melation Sound’s public release history.</p><div class="ovo-meta"><span>148 tracks</span><span>Sorted by collaborator</span><span>MP3 + M4A audio</span></div><button type="button" class="ovo-primary-button" id="ovoPlayCollection">Play collection</button></div></section>
+  <div class="ovo-marquee" aria-hidden="true"><div class="ovo-marquee-track"><span><b>OVO</b> · DRAKE · PRIVATE ARCHIVE · 148 TRACKS · MELATION SOUND ·</span><span><b>OVO</b> · DRAKE · PRIVATE ARCHIVE · 148 TRACKS · MELATION SOUND ·</span></div></div>
+  <section class="ovo-archive" aria-labelledby="ovoArchiveTitle"><div class="ovo-archive-head"><h2 id="ovoArchiveTitle">OVO archive.</h2><span id="ovoTrackCount">148 tracks</span></div><div class="ovo-search-wrap"><label for="ovoTrackSearch">Find a track</label><input id="ovoTrackSearch" type="search" placeholder="Search song or collaborator" autocomplete="off" spellcheck="false"></div><div id="ovoTracklist"></div></section>
+</div></main>
+<footer class="label-footer"><div class="wrap"><div class="label-footer-row"><span>OVO · Melation Sound</span><div class="footer-utility-links"><a href="browse.html">Browse</a><a href="profile.html">Profile</a><a href="playlist.html">Playlist</a><a href="achievements.html">Achievements</a><a href="updates.html">Updates</a><a href="admin.html">Admin</a></div></div><p class="label-footer-note">© 2026 Melation Sound · Private OVO archive.</p></div></footer>
+<div id="label-player-mount" data-label-start="-1"></div>
+<script src="config/firebase-config.js?v=20260827-2"></script>
+<script type="module" src="scripts/community.js?v=20260830-4"></script>
+<script src="scripts/ovo-catalog.js?v=20260830-1"></script>
+<script src="scripts/label-player.js?v=20260830-3"></script>
+<script src="scripts/site-search.js?v=20260827-3"></script>
+<script src="scripts/pwa.js?v=20260830-2"></script>
+<script src="scripts/ovo.js?v=20260830-1"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, collection } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
 const config = window.MELATION_FIREBASE_CONFIG || {};
 const ROOT = 'melationSound';
@@ -71,7 +71,6 @@ async function saveOwnPlaylist(playlist) {
   if (db) await setDoc(doc(accounts, current.usernameKey), { playlist: ownPlaylist }, { merge: true });
   else writeLocalPlaylist(ownPlaylist);
   renderOwnPlaylist();
-  renderBrowse();
   return true;
 }
 
@@ -103,18 +102,6 @@ async function addTrack(id) {
   await saveOwnPlaylist(playlist);
   return true;
 }
-function renderBrowseRows(rows) {
-  const target = document.getElementById('playlistBrowseList');
-  if (!target) return;
-  const visible = rows.filter(row => row.playlist && row.playlist.trackIds?.length).sort((a,b) => (b.playlist.updatedAtMs || 0) - (a.playlist.updatedAtMs || 0));
-  target.innerHTML = visible.length ? visible.map(row => { const playlist = normalizePlaylist(row.playlist, row.displayName || row.username); const first = byId[playlist.trackIds[0]] || catalog[0]; return '<a class="playlist-browse-row" href="profile.html?uid=' + encodeURIComponent(row.id) + '"><img class="playlist-browse-art" src="' + escapeHtml(first.art) + '" alt=""><span class="playlist-browse-copy"><strong>' + escapeHtml(playlist.name) + '</strong><small>@' + escapeHtml(row.username || row.id) + '</small></span><span class="playlist-browse-meta">' + playlist.trackIds.length + ' tracks<small>' + durationLabel(duration(playlist.trackIds)) + '</small></span></a>'; }).join('') : '<p class="community-empty">No public playlists yet. Create yours and it will appear here.</p>';
-}
-async function renderBrowse() {
-  const target = document.getElementById('playlistBrowseList');
-  if (!target) return;
-  if (!db) { const local = getLocal(); renderBrowseRows(local?.playlist ? [{ id: local.uid || 'local-listener', username: local.username || 'local-listener', displayName: local.displayName, playlist: local.playlist }] : []); return; }
-  try { const snapshot = await getDocs(accounts); renderBrowseRows(snapshot.docs.map(item => ({ id: item.id, ...item.data() }))); } catch (error) { target.innerHTML = '<p class="community-empty">Public playlists are temporarily unavailable.</p>'; }
-}
 async function renderProfilePlaylist() {
   const list = document.getElementById('profilePlaylistList');
   if (!list) return;
@@ -140,7 +127,6 @@ function bindPlaylistUi() {
   form.addEventListener('submit', async event => { event.preventDefault(); const input = document.getElementById('playlistName'); const status = document.getElementById('playlistStatus'); const playlist = ownPlaylist || await readPlaylist(user()); playlist.name = (input?.value || '').trim().slice(0, 50) || ((user()?.displayName || user()?.username || 'User') + "'s Playlist"); status.textContent = 'Saving…'; try { await saveOwnPlaylist(playlist); status.textContent = 'Playlist saved.'; } catch (error) { status.textContent = 'Could not save your playlist.'; } });
   add.addEventListener('click', async () => { const id = document.getElementById('playlistTrackSelect')?.value; const status = document.getElementById('playlistStatus'); if (!id) return; status.textContent = 'Adding…'; try { await addTrack(id); status.textContent = 'Song added to your playlist.'; } catch (error) { status.textContent = 'Could not update your playlist.'; } });
   list.addEventListener('click', async event => { const button = event.target.closest('[data-playlist-remove]'); if (!button || !ownPlaylist) return; ownPlaylist.trackIds.splice(Number(button.dataset.playlistRemove), 1); try { await saveOwnPlaylist(ownPlaylist); setText('playlistStatus', 'Song removed.'); } catch (error) { setText('playlistStatus', 'Could not update your playlist.'); } });
-  renderBrowse();
 }
 function bindSongPlaylist() {
   const button = document.getElementById('songPlaylistAdd');
@@ -161,6 +147,5 @@ async function refresh() {
 }
 
 await initRemote();
-renderBrowse();
 setInterval(refresh, 700);
 refresh();
