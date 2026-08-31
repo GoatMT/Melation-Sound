@@ -8,6 +8,7 @@
 
   var catalog = [
     { title: 'A Broken Dream', meta: 'Album · Osama, MT', action: 'Open album', href: 'albums/a-broken-dream/index.html', terms: 'a broken dream album osama mt' },
+    { title: 'Location Unknown', meta: 'Upcoming album · MT', action: 'View announcement', href: 'timeline.html#location-unknown', terms: 'location unknown upcoming album mt next release' },
     { title: '10:20', meta: 'Single · MT', action: 'Open single', href: 'singles/10-20/index.html', terms: '10 20 1020 single mt' },
     { title: 'A Dreams A Mystery', meta: 'Song · Osama, MT · A Broken Dream', action: 'Open song page', href: 'songs/song.html?track=01', terms: 'a dreams a mystery song osama mt' },
     { title: 'Nightmare Fuel', meta: 'Song · Osama, MT and Adam · A Broken Dream', action: 'Open song page', href: 'songs/song.html?track=02', terms: 'nightmare fuel song osama mt adam' },

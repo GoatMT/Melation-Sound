@@ -6,6 +6,8 @@
   var search = document.getElementById('ovoTrackSearch');
   var count = document.getElementById('ovoTrackCount');
   var playCollection = document.getElementById('ovoPlayCollection');
+  var activeTrackId = '';
+  var activePlaying = false;
   if (!list) return;
 
   function escapeHtml(value) {
@@ -30,9 +32,20 @@
     return groups;
   }
 
-  function updatePlayingState(trackId) {
+  function updatePlayingState(trackId, playing) {
+    activeTrackId = String(trackId || '');
+    activePlaying = Boolean(playing);
     list.querySelectorAll('[data-ovo-row]').forEach(function (row) {
-      row.classList.toggle('is-playing', row.getAttribute('data-ovo-row') === trackId);
+      var isPlaying = activePlaying && row.getAttribute('data-ovo-row') === activeTrackId;
+      row.classList.toggle('is-playing', isPlaying);
+      var button = row.querySelector('[data-ovo-index]');
+      if (button) {
+        var track = catalog[Number(button.getAttribute('data-ovo-index'))];
+        var buttonLabel = isPlaying ? 'Pause' : 'Play';
+        var label = button.querySelector('.ovo-track-play-label');
+        if (label) label.textContent = buttonLabel;
+        button.setAttribute('aria-label', buttonLabel + ' ' + (track ? track.name : 'track'));
+      }
     });
   }
 
@@ -52,7 +65,7 @@
         var index = catalog.indexOf(track);
         number += 1;
         return '<div class="ovo-track-row" data-ovo-row="' + escapeHtml(track.id) + '">' +
-          '<button type="button" class="ovo-track-play" data-ovo-index="' + index + '" aria-label="Play ' + escapeHtml(track.name) + '"><span class="ovo-track-play-icon" aria-hidden="true"></span><span>Play</span></button>' +
+          '<button type="button" class="ovo-track-play" data-ovo-index="' + index + '" aria-label="Play ' + escapeHtml(track.name) + '"><span class="ovo-track-play-icon" aria-hidden="true"></span><span class="ovo-track-play-label">Play</span></button>' +
           '<span class="ovo-track-number">' + String(number).padStart(3, '0') + '</span>' +
           '<div class="ovo-track-copy"><strong>' + escapeHtml(track.name) + '</strong><small>' + escapeHtml(track.artist) + '</small></div>' +
           '<span class="ovo-track-format">' + escapeHtml(track.format || 'AUDIO') + '</span>' +
@@ -60,6 +73,7 @@
       }).join('');
       return '<section class="ovo-artist-group"><div class="ovo-artist-group-head"><h3>' + escapeHtml(group.name) + '</h3><span>' + group.tracks.length + (group.tracks.length === 1 ? ' track' : ' tracks') + '</span></div>' + rows + '</section>';
     }).join('');
+    updatePlayingState(activeTrackId, activePlaying);
   }
 
   list.addEventListener('click', function (event) {
@@ -73,8 +87,12 @@
   });
   window.addEventListener('melation:playerstate', function (event) {
     var track = event.detail && event.detail.track;
-    updatePlayingState(track && track.id ? track.id : '');
+    updatePlayingState(track && track.id ? track.id : '', event.detail && event.detail.playing);
     if (playCollection) playCollection.textContent = event.detail && event.detail.playing ? 'Pause current track' : 'Play collection';
   });
   render();
+  if (window.melationGetPlayerState) {
+    var playerState = window.melationGetPlayerState();
+    updatePlayingState(playerState.track && playerState.track.id ? playerState.track.id : '', playerState.playing);
+  }
 }());

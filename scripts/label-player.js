@@ -105,6 +105,9 @@
   var roomChatLoad = null;
   var roomChatUnsubscribe = null;
   var roomChatRoomId = '';
+  window.melationGetPlayerState = function () {
+    return { playing: !audio.paused && currentIndex >= 0, track: currentIndex >= 0 ? tracks[currentIndex] : null };
+  };
 
   function ensureLiveRoomPlayerStyles() {
     if (document.getElementById('labelPlayerLiveRoomStyles')) return;
@@ -113,7 +116,15 @@
     style.textContent = '.label-player.is-live-room .label-player-seek-row input{pointer-events:none;cursor:not-allowed;opacity:.58}.label-player.is-live-room .label-player-live{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:7px}.label-player.is-live-room .label-player-live>button{grid-column:1/-1;justify-self:center;min-width:110px;min-height:36px;margin-top:4px;padding:9px 18px;border:1px solid #62b2ff;background:#0a2944;color:#e9f6ff;font:700 10px/1 "Space Mono",monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}.label-player.is-live-room .label-player-live>button:hover,.label-player.is-live-room .label-player-live>button:focus-visible{background:#14517f;outline:2px solid #9bd6ff;outline-offset:2px}@media (max-width:700px){.label-player.is-live-room .label-player-live>button{min-width:96px;min-height:34px;padding:8px 14px;font-size:9px}}';
     document.head.appendChild(style);
   }
+  function ensureTrackButtonStyles() {
+    if (document.getElementById('labelTrackButtonStyles')) return;
+    var style = document.createElement('style');
+    style.id = 'labelTrackButtonStyles';
+    style.textContent = '.js-label-play.has-label{width:auto;min-width:78px;height:36px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 11px;border-radius:999px}.js-label-play.has-label svg{width:13px;height:13px;display:block;flex:0 0 13px}.label-track-button-text{font:9px/1 "Space Mono",monospace;letter-spacing:.06em;text-transform:uppercase}.js-label-play.has-label .label-track-button-text{white-space:nowrap}@media(max-width:700px){.js-label-play.has-label{min-width:72px;padding:0 9px}}';
+    document.head.appendChild(style);
+  }
   ensureLiveRoomPlayerStyles();
+  ensureTrackButtonStyles();
 
   function hasListenerAccount() {
     var service = window.MelationCommunity;
@@ -339,11 +350,13 @@
       var index = parseInt(button.getAttribute('data-label-track') || '0', 10);
       var isCurrent = index === currentIndex;
       var isPlaying = isCurrent && !audio.paused;
-      button.innerHTML = isPlaying ? PAUSE : PLAY;
+      var buttonLabel = isPlaying ? 'Pause' : 'Play';
+      button.innerHTML = (isPlaying ? PAUSE : PLAY) + '<span class="label-track-button-text">' + buttonLabel + '</span>';
+      button.classList.add('has-label');
       button.classList.toggle('is-playing', isPlaying);
       var row = button.closest('.single-track-row');
       if (row) row.classList.toggle('is-playing', isPlaying);
-      if (tracks[index]) button.setAttribute('aria-label', isPlaying ? 'Pause ' + tracks[index].name : 'Play ' + tracks[index].name);
+      if (tracks[index]) button.setAttribute('aria-label', buttonLabel + ' ' + tracks[index].name);
     });
     window.dispatchEvent(new CustomEvent('melation:playerstate', { detail: { playing: !audio.paused && currentIndex >= 0, hasTrack: currentIndex >= 0, track: currentIndex >= 0 ? tracks[currentIndex] : null } }));
   }
@@ -563,11 +576,11 @@
     if (isLiveRoom()) { seeking = false; if (audio.duration) { var livePct = (audio.currentTime / audio.duration) * 100; seek.value = livePct; updateSeekFill(livePct); current.textContent = formatTime(audio.currentTime); } return; }
     if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration; seeking = false; saveState();
   });
-  audio.addEventListener('timeupdate', function () { if (!seeking && audio.duration) { var pct = (audio.currentTime / audio.duration) * 100; seek.value = pct; updateSeekFill(pct); current.textContent = formatTime(audio.currentTime); } if (window.MelationCommunity && currentIndex >= 0 && !audio.paused && audio.currentTime - communityLastReportedTime >= 10) { var listenedSeconds = audio.currentTime - communityLastReportedTime; communityLastReportedTime = audio.currentTime; window.MelationCommunity.recordListen(tracks[currentIndex].id, listenedSeconds); } });
+  audio.addEventListener('timeupdate', function () { if (!seeking && audio.duration) { var pct = (audio.currentTime / audio.duration) * 100; seek.value = pct; updateSeekFill(pct); current.textContent = formatTime(audio.currentTime); } if (!ovoPage && window.MelationCommunity && currentIndex >= 0 && !audio.paused && audio.currentTime - communityLastReportedTime >= 10) { var listenedSeconds = audio.currentTime - communityLastReportedTime; communityLastReportedTime = audio.currentTime; window.MelationCommunity.recordListen(tracks[currentIndex].id, listenedSeconds); } });
   audio.addEventListener('loadedmetadata', function () { duration.textContent = formatTime(audio.duration); });
   audio.addEventListener('play', function () { if (currentIndex >= 0) communityPlayEligible = true; updateButtons(); saveState(); });
   audio.addEventListener('pause', function () { updateButtons(); saveState(navigationResumeIntent ? true : undefined); });
-  audio.addEventListener('ended', function () { var finishedTrack = currentIndex >= 0 ? tracks[currentIndex] : null; if (finishedTrack && communityPlayEligible && window.MelationCommunity) window.MelationCommunity.recordPlay(finishedTrack.id); communityPlayEligible = false; if (repeat && currentIndex >= 0) loadTrack(currentIndex, true); else if (tracks.length > 1) loadTrack(nextTrackIndex(1), true); else { audio.currentTime = 0; updateButtons(); } });
+  audio.addEventListener('ended', function () { var finishedTrack = currentIndex >= 0 ? tracks[currentIndex] : null; if (!ovoPage && finishedTrack && communityPlayEligible && window.MelationCommunity) window.MelationCommunity.recordPlay(finishedTrack.id); communityPlayEligible = false; if (repeat && currentIndex >= 0) loadTrack(currentIndex, true); else if (tracks.length > 1) loadTrack(nextTrackIndex(1), true); else { audio.currentTime = 0; updateButtons(); } });
   document.addEventListener('click', function (event) {
     if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     var link = event.target.closest && event.target.closest('a[href]');

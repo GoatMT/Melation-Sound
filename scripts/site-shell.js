@@ -35,16 +35,6 @@
     });
   }
 
-  function relabelCatalogLink(nav) {
-    if (!nav) return;
-    var catalogLink = nav.querySelector('a[href="#catalog"], a[href="index.html#catalog"]');
-    if (!catalogLink) return;
-    catalogLink.href = 'ovo.html';
-    catalogLink.textContent = 'OVO';
-    if (window.location.pathname.toLowerCase().indexOf('/ovo.html') !== -1) catalogLink.setAttribute('aria-current', 'page');
-    else catalogLink.removeAttribute('aria-current');
-  }
-
   function addQuickMix() {
     if (document.querySelector('[data-quick-mix]')) return;
     var actions = document.createElement('aside');
@@ -78,7 +68,6 @@
     var nav = document.querySelector('.label-links, .nav-links');
     var path = window.location.pathname.toLowerCase();
     var isReleaseMiniSite = path.indexOf('/albums/a-broken-dream/') !== -1 || path.indexOf('/singles/10-20/') !== -1;
-    if (!/(\/albums\/|\/singles\/|\/songs\/)/.test(path)) relabelCatalogLink(nav);
     if (!isReleaseMiniSite) addMoreMenu(nav);
     addQuickMix();
   }

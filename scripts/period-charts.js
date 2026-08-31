@@ -6,6 +6,9 @@ const stateKey = 'melationPeriodChartState';
 const state = readState();
 let stopSongs = null;
 let stopUsers = null;
+let historyStarted = false;
+let periodSongs = [];
+let periodListeners = [];
 
 function readState() {
   try {
@@ -64,10 +67,21 @@ function setEmpty(id, message) {
   if (element) element.innerHTML = '<p class="period-empty">' + escapeHtml(message) + '</p>';
 }
 
+function rowBelongsToPeriod(row, period) {
+  if (!row) return false;
+  if (String(row.periodKey || '') === period.key) return true;
+  return row.periodType === period.type && Number(row.periodStartMs) === period.startMs;
+}
+
+function selectedPeriod() {
+  return periodInfo(state.type, state.offset);
+}
+
 function renderSongs(rows) {
   const target = document.getElementById('periodSongChart');
   if (!target) return;
-  const sorted = rows.filter(row => row.periodKey === periodInfo(state.type, state.offset).key).sort((a, b) => (Number(b.plays || 0) - Number(a.plays || 0)) || (Number(b.seconds || 0) - Number(a.seconds || 0)) || String(a.title || '').localeCompare(String(b.title || ''))).slice(0, 10);
+  const period = selectedPeriod();
+  const sorted = rows.filter(row => rowBelongsToPeriod(row, period)).sort((a, b) => (Number(b.plays || 0) - Number(a.plays || 0)) || (Number(b.seconds || 0) - Number(a.seconds || 0)) || String(a.title || '').localeCompare(String(b.title || ''))).slice(0, 10);
   if (!sorted.length) { setEmpty('periodSongChart', 'No song activity has been recorded for this period yet.'); return; }
   const max = Math.max(1, ...sorted.map(row => Number(row.plays || 0)));
   target.innerHTML = sorted.map((row, index) => '<a class="chart-row period-chart-row" href="songs/song.html?track=' + encodeURIComponent(row.songId || '') + '"><span class="chart-rank">' + String(index + 1).padStart(2, '0') + '</span><img src="' + escapeHtml(row.art || '') + '" alt=""><span class="chart-song"><strong>' + escapeHtml(row.title || 'Untitled') + '</strong><small>' + escapeHtml(row.artist || 'Unknown artist') + ' · ' + Number(row.plays || 0) + ' plays · ' + formatDuration(row.seconds) + '</small><i style="width:' + Math.max(8, Math.round(Number(row.plays || 0) / max * 100)) + '%"></i></span><span class="chart-value">' + Number(row.plays || 0) + '<small>plays</small></span></a>').join('');
@@ -76,13 +90,14 @@ function renderSongs(rows) {
 function renderUsers(rows) {
   const target = document.getElementById('periodUserChart');
   if (!target) return;
-  const sorted = rows.filter(row => row.periodKey === periodInfo(state.type, state.offset).key).sort((a, b) => (Number(b.totalSeconds || 0) - Number(a.totalSeconds || 0)) || (Number(b.plays || 0) - Number(a.plays || 0)) || String(a.displayName || '').localeCompare(String(b.displayName || ''))).slice(0, 10);
+  const period = selectedPeriod();
+  const sorted = rows.filter(row => rowBelongsToPeriod(row, period)).sort((a, b) => (Number(b.totalSeconds || 0) - Number(a.totalSeconds || 0)) || (Number(b.plays || 0) - Number(a.plays || 0)) || String(a.displayName || '').localeCompare(String(b.displayName || ''))).slice(0, 10);
   if (!sorted.length) { setEmpty('periodUserChart', 'No listener activity has been recorded for this period yet.'); return; }
   target.innerHTML = sorted.map((row, index) => '<a class="period-listener-row" href="profile.html?uid=' + encodeURIComponent(row.usernameKey || '') + '"><span class="period-listener-rank">' + String(index + 1).padStart(2, '0') + '</span><span class="period-listener-copy"><strong>' + escapeHtml(row.displayName || row.usernameKey || 'Listener') + '</strong><small>' + Number(row.plays || 0) + ' plays · ' + (Array.isArray(row.songIds) ? row.songIds.length : 0) + ' songs</small></span><span class="period-listener-value">' + formatDuration(row.totalSeconds) + '<small>listened</small></span></a>').join('');
 }
 
 function updateControls() {
-  const period = periodInfo(state.type, state.offset);
+  const period = selectedPeriod();
   setText('periodLabel', formatPeriod(period));
   setText('periodSongSummary', state.type === 'week' ? 'Selected week' : 'Selected month');
   setText('periodUserSummary', state.type === 'week' ? 'Weekly listening time' : 'Monthly listening time');
@@ -95,12 +110,19 @@ function updateControls() {
   });
 }
 
+function renderCurrentPeriod() {
+  renderSongs(periodSongs);
+  renderUsers(periodListeners);
+}
+
 function watchPeriodData() {
-  if (stopSongs) stopSongs();
-  if (stopUsers) stopUsers();
-  const period = periodInfo(state.type, state.offset);
-  setEmpty('periodSongChart', 'Loading this period…');
-  setEmpty('periodUserChart', 'Loading this period…');
+  if (historyStarted) {
+    renderCurrentPeriod();
+    return;
+  }
+  historyStarted = true;
+  setEmpty('periodSongChart', 'Loading saved period history…');
+  setEmpty('periodUserChart', 'Loading saved period history…');
   const firebaseConfigured = Boolean(config.apiKey && config.projectId && config.appId);
   if (!firebaseConfigured) {
     setEmpty('periodSongChart', 'Period charts need Firestore to be connected.');
@@ -111,13 +133,18 @@ function watchPeriodData() {
     const app = getApps().find(item => item.name === '[DEFAULT]') || initializeApp(config, 'periodCharts');
     const db = getFirestore(app);
     const root = doc(db, 'melationSound', 'main');
-    stopSongs = onSnapshot(collection(root, 'periodSongs'), snapshot => renderSongs(snapshot.docs.map(item => item.data())), () => setEmpty('periodSongChart', 'Period song data is temporarily unavailable.'));
-    stopUsers = onSnapshot(collection(root, 'periodListeners'), snapshot => renderUsers(snapshot.docs.map(item => item.data())), () => setEmpty('periodUserChart', 'Period listener data is temporarily unavailable.'));
+    stopSongs = onSnapshot(collection(root, 'periodSongs'), snapshot => {
+      periodSongs = snapshot.docs.map(item => item.data());
+      renderSongs(periodSongs);
+    }, () => setEmpty('periodSongChart', 'Period song data is temporarily unavailable.'));
+    stopUsers = onSnapshot(collection(root, 'periodListeners'), snapshot => {
+      periodListeners = snapshot.docs.map(item => item.data());
+      renderUsers(periodListeners);
+    }, () => setEmpty('periodUserChart', 'Period listener data is temporarily unavailable.'));
   } catch (error) {
     setEmpty('periodSongChart', 'Period charts are temporarily unavailable.');
     setEmpty('periodUserChart', 'Period charts are temporarily unavailable.');
   }
-  void period;
 }
 
 document.querySelectorAll('[data-period-type]').forEach(button => button.addEventListener('click', () => {
@@ -125,10 +152,10 @@ document.querySelectorAll('[data-period-type]').forEach(button => button.addEven
   state.offset = 0;
   saveState();
   updateControls();
-  watchPeriodData();
+  renderCurrentPeriod();
 }));
-document.getElementById('periodPrevious')?.addEventListener('click', () => { state.offset -= 1; saveState(); updateControls(); watchPeriodData(); });
-document.getElementById('periodNext')?.addEventListener('click', () => { if (state.offset >= 0) return; state.offset += 1; saveState(); updateControls(); watchPeriodData(); });
+document.getElementById('periodPrevious')?.addEventListener('click', () => { state.offset -= 1; saveState(); updateControls(); renderCurrentPeriod(); });
+document.getElementById('periodNext')?.addEventListener('click', () => { if (state.offset >= 0) return; state.offset += 1; saveState(); updateControls(); renderCurrentPeriod(); });
 
 updateControls();
 watchPeriodData();
