@@ -40,6 +40,35 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      match /periodListeners/{periodId} {
+        allow read: if true;
+        allow create, update: if request.resource.data.keys().hasAll([
+          "periodKey", "periodType", "periodStartMs", "usernameKey", "displayName", "totalSeconds", "plays", "songIds", "updatedAtMs"
+        ]) && request.resource.data.periodType in ["week", "month"]
+          && request.resource.data.periodKey is string
+          && request.resource.data.usernameKey is string
+          && request.resource.data.displayName is string
+          && request.resource.data.periodStartMs is number
+          && request.resource.data.totalSeconds is number
+          && request.resource.data.plays is number
+          && request.resource.data.songIds is list;
+        allow delete: if false;
+      }
+
+      match /periodSongs/{periodId} {
+        allow read: if true;
+        allow create, update: if request.resource.data.keys().hasAll([
+          "periodKey", "periodType", "periodStartMs", "songId", "title", "artist", "art", "seconds", "plays", "updatedAtMs"
+        ]) && request.resource.data.periodType in ["week", "month"]
+          && request.resource.data.periodKey is string
+          && request.resource.data.songId is string
+          && request.resource.data.title is string
+          && request.resource.data.artist is string
+          && request.resource.data.seconds is number
+          && request.resource.data.plays is number;
+        allow delete: if false;
+      }
+
       match /rooms/{roomId} {
         allow read: if true;
         allow create, update: if request.resource.data.keys().hasAll([
