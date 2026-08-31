@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="../../">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png?v=20260828-1">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=20260828-1">
+<link rel="manifest" href="assets/site.webmanifest?v=20260828-2">
+<meta name="theme-color" content="#020509">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Location Unknown · Melation Sound">
+<meta name="description" content="Location Unknown, the upcoming MT album, with its confirmed songs and current progress.">
+<title>Location Unknown · Melation Sound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/label.css">
+<link rel="stylesheet" href="styles/site-motion.css?v=20260827-7">
+<link rel="stylesheet" href="styles/site-search.css?v=20260827-3">
+</head>
+<body class="label-page location-unknown-page">
+<header class="label-header">
+  <nav class="label-nav wrap" aria-label="Main navigation">
+    <a class="label-brand" href="index.html" aria-label="Melation Sound home"><img src="assets/melation-sound.png" alt="Melation Sound M logo"><span class="label-brand-name">MELATION <span>SOUND</span></span></a>
+    <div class="label-links">
+      <a href="index.html#catalog" aria-current="page">Albums &amp; Singles</a>
+      <a href="artists.html">Artists</a>
+      <a href="timeline.html">Timeline</a>
+      <a href="charts.html">Charts</a>
+      <a href="community.html">Account</a>
+      <a href="about.html">About</a>
+    </div>
+    <form class="site-search" role="search" aria-label="Search Melation Sound" autocomplete="off">
+      <label class="sr-only" for="siteSearchInput">Search Melation Sound</label>
+      <input id="siteSearchInput" type="search" placeholder="Search the catalog" autocomplete="off" spellcheck="false" aria-controls="siteSearchResults" aria-expanded="false">
+      <button type="submit" aria-label="Search Melation Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
+      <div class="site-search-results" id="siteSearchResults" role="listbox"></div>
+    </form>
+  </nav>
+</header>
+<main class="label-main">
+  <div class="wrap label-subpage">
+    <p class="label-kicker">Melation Sound · upcoming album</p>
+    <section class="location-unknown-hero" aria-labelledby="locationUnknownTitle">
+      <div class="location-unknown-cover-frame"><img class="location-unknown-cover-image" src="albums/location-unknown/assets/location-unknown-cover.png" alt="Location Unknown album cover by MT"></div>
+      <div>
+        <p class="label-profile-role">Title confirmed · release details coming soon</p>
+        <h1 class="label-page-title" id="locationUnknownTitle">Location Unknown</h1>
+        <p class="label-subpage-intro">MT's next album is taking shape as a sequel to <a class="location-unknown-inline-link" href="singles/10-20/index.html">10:20</a>. The first confirmed songs are listed below with their current progress.</p>
+        <div class="label-profile-links"><a href="index.html#catalog">Back to Albums &amp; Singles →</a><a href="albums/a-broken-dream/artist-mt.html">View MT's profile →</a></div>
+      </div>
+    </section>
+    <section class="location-unknown-tracklist" aria-labelledby="locationUnknownTracklistTitle">
+      <div class="single-tracklist-head"><div><p class="label-kicker">Confirmed sequence</p><h2 id="locationUnknownTracklistTitle">Tracklist</h2></div><span>02 tracks announced</span></div>
+      <div class="simple-list">
+        <div class="simple-track location-unknown-track"><span class="simple-track-number">01</span><div><span class="simple-track-name">Cream Soda Crush</span><span class="simple-track-artist">MT · confirmed song</span></div><span class="simple-track-status">Lyrics done · est. 03:00</span></div>
+        <div class="simple-track location-unknown-track is-in-progress"><span class="simple-track-number">02</span><div><span class="simple-track-name">My People</span><span class="simple-track-artist">MT · confirmed song</span></div><span class="simple-track-status">In the works · runtime TBA</span></div>
+      </div>
+      <p class="location-unknown-note">More songs, artwork, audio, and release details will be added as the album develops.</p>
+    </section>
+  </div>
+</main>
+<footer class="label-footer"><div class="wrap"><div class="label-footer-row"><span>Melation Sound</span><div class="footer-utility-links"><a href="browse.html">Browse</a><a href="profile.html">Profile</a><a href="playlist.html">Playlist</a><a href="achievements.html">Achievements</a><a href="updates.html">Updates</a><a href="admin.html">Admin</a></div></div><p class="label-footer-note">© 2026 Melation Sound · Parental Advisory — Explicit Content.</p></div></footer>
+<div id="label-player-mount" data-label-start="-1"></div>
+<script src="config/firebase-config.js?v=20260827-2"></script>
+<script type="module" src="scripts/community.js?v=20260830-4"></script>
+<script src="scripts/label-player.js?v=20260830-2"></script>
+<script src="scripts/site-search.js?v=20260831-1"></script>
+<script type="module" src="scripts/community-features.js?v=20260827-1"></script>
+<script src="scripts/pwa.js?v=20260831-1"></script>
+</body>
+</html>
