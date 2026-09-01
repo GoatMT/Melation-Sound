@@ -392,6 +392,10 @@
     communityLastReportedTime = 0;
     var trackUrl = new URL(track.src, document.baseURI).href;
     if (audio.src !== trackUrl) audio.src = track.src;
+    // Explicitly rewind on every new play request. This is important when
+    // repeat starts the same source again after the media element fires
+    // `ended`—some browsers otherwise retain the ended position.
+    if (autoplay) audio.currentTime = 0;
     art.src = track.art;
     name.textContent = track.name;
     artist.textContent = track.artist;
@@ -400,7 +404,9 @@
     duration.textContent = '0:00';
     player.classList.toggle('is-exclusive', !!track.exclusive);
     expand.href = track.page || ('songs/song.html?track=' + encodeURIComponent(track.id));
-    expand.hidden = false;
+    // The OVO archive intentionally keeps its catalog player compact and
+    // does not expose the song-page/full-screen control.
+    expand.hidden = ovoPage;
     expand.setAttribute('aria-label', 'Open ' + track.name + ' song page');
     expand.setAttribute('title', 'Open ' + track.name + ' song page');
     player.classList.add('open');

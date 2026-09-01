@@ -53,8 +53,30 @@
 .single-release-page .release-banner{background-image:linear-gradient(180deg,rgba(8,10,13,.48),rgba(8,10,13,.88)),url('../singles/10-20/assets/1020.png');background-size:cover;background-position:center 42%}
 .single-release-page .release-banner-text{font-family:'Permanent Marker',cursive;color:var(--release-accent)}
 .single-release-page .single-tracklist-section{margin-top:0}
+.single-release-page .single-tracklist-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:48px;padding:0 0 24px;border-bottom:1px solid var(--release-line)}
+.single-release-page .single-tracklist-head .label-kicker{margin:0 0 9px;color:var(--release-accent)}
+.single-release-page .single-tracklist-head h2{margin:0;color:#f5f2eb;font:clamp(34px,4vw,46px) 'Bebas Neue',sans-serif;letter-spacing:.03em;text-transform:uppercase}
+.single-release-page .single-tracklist-head>span{color:var(--release-muted);font:12px 'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+.single-release-page .single-track-row{display:grid;grid-template-columns:86px 44px minmax(0,1fr) auto 50px 60px 34px;align-items:center;gap:16px;padding:20px 4px;border:0;border-bottom:1px solid var(--release-line);background:transparent;transition:background .15s ease,border-color .15s ease}
+.single-release-page .single-track-row:hover{border-color:var(--release-line);background:rgba(142,203,255,.035)}
+.single-release-page .single-track-row.is-playing{border-color:var(--release-line);background:rgba(142,203,255,.07);box-shadow:inset 3px 0 0 var(--release-accent)}
+.single-release-page .single-track-play{width:34px;height:34px;margin-left:4px;color:var(--release-accent);border-color:var(--release-muted);background:transparent}
+.single-release-page .single-track-play:hover{color:#fff;border-color:var(--release-accent);background:rgba(142,203,255,.1)}
+.single-release-page .single-track-play.is-playing{color:#071018;background:var(--release-accent);border-color:var(--release-accent)}
+.single-release-page .single-track-number{color:var(--release-muted);font:14px 'Space Mono',monospace}
+.single-release-page .single-track-row:hover .single-track-number,.single-release-page .single-track-row.is-playing .single-track-number{color:var(--release-accent)}
+.single-release-page .single-track-name{font:16px/1.2 'Archivo',sans-serif;font-weight:500;letter-spacing:0}
+.single-release-page .single-track-artist{margin:3px 0 0;color:var(--release-muted);font:9.5px 'Space Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
+.single-release-page .single-track-release{color:var(--release-muted);font:11px 'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.single-release-page .single-track-length{color:var(--release-muted);font:12px 'Space Mono',monospace;text-align:right;white-space:nowrap}
+.single-release-page .single-track-wave{display:flex;align-items:flex-end;justify-self:end;gap:2px;height:18px;opacity:.5}
+.single-release-page .single-track-wave i{width:3px;height:var(--track-bar-height,12px);background:var(--release-muted)}
+.single-release-page .single-track-row:hover .single-track-wave,.single-release-page .single-track-row.is-playing .single-track-wave{opacity:1}
+.single-release-page .single-track-row:hover .single-track-wave i,.single-release-page .single-track-row.is-playing .single-track-wave i{background:var(--release-accent)}
+.single-release-page .single-track-info{width:28px;height:28px;color:var(--release-muted);border-color:var(--release-muted);background:transparent}
+.single-release-page .single-track-info:hover{color:#fff;background:rgba(142,203,255,.1);border-color:var(--release-accent)}
 @keyframes release-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes release-art-breathe{from{transform:scale(1)}to{transform:scale(1.018)}}
 @keyframes release-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(max-width:700px){.release-page .hero{padding:52px 0 64px}.release-page .hero-grid{grid-template-columns:1fr;gap:44px;padding:0 18px}.release-page .hero-art-frame{width:min(100%,390px)}.release-page .release-section{padding:64px 0}.release-page .release-section-inner{padding:0 18px}.release-page .release-section-title{font-size:46px}.single-release-page .release-title{font-size:clamp(60px,17vw,104px)}.release-footer-row{align-items:flex-start;flex-direction:column}}
+@media(max-width:700px){.release-page .hero{padding:52px 0 64px}.release-page .hero-grid{grid-template-columns:1fr;gap:44px;padding:0 18px}.release-page .hero-art-frame{width:min(100%,390px)}.release-page .release-section{padding:64px 0}.release-page .release-section-inner{padding:0 18px}.release-page .release-section-title{font-size:46px}.single-release-page .release-title{font-size:clamp(60px,17vw,104px)}.single-release-page .single-track-row{grid-template-columns:78px 34px minmax(0,1fr) 28px;gap:10px;padding:15px 0}.single-release-page .single-track-play{margin-left:0}.single-release-page .single-track-release,.single-release-page .single-track-length,.single-release-page .single-track-wave{display:none}.single-release-page .single-track-info{justify-self:end}.release-footer-row{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.release-page .hero-copy>*,.release-page .hero-art-frame,.release-page .hero-art-frame img,.release-page .marquee-track{animation:none!important;opacity:1;transform:none}.release-page .release-actions a:first-child{transition:none}}
