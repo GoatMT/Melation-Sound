@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melation-sound-shell-v20';
+const CACHE_NAME = 'melation-sound-shell-v22';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -16,6 +16,6 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(request, { cache: 'no-store' }).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(request, copy)); return response; }).catch(() => caches.match(request).then(response => response || caches.match('./index.html'))));
     return;
   }
-  const isCode = request.destination === 'script' || request.destination === 'style';
-  event.respondWith(fetch(request, isCode ? { cache: 'no-store' } : undefined).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(request, copy)); return response; }).catch(() => caches.match(request)));
+  const isImmediateAsset = request.destination === 'script' || request.destination === 'style' || request.destination === 'image';
+  event.respondWith(fetch(request, isImmediateAsset ? { cache: 'no-store' } : undefined).then(response => { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(request, copy)); return response; }).catch(() => caches.match(request)));
 });

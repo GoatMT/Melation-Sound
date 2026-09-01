@@ -1,5 +1,5 @@
 :root{--label-blue:#1687ff;--label-blue-soft:#62b2ff;--label-line:#183451;--label-muted:#8a9caf}
-body.label-page{background:#020509;color:#eef6ff}
+body.label-page{background:#020509;color:#eef6ff;color-scheme:dark}
 body.label-page::after{background:radial-gradient(ellipse at center,transparent 34%,rgba(0,0,0,.82) 100%)}
 .label-header{position:sticky;top:0;z-index:200;background:rgba(2,5,9,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--label-line);box-shadow:0 8px 34px rgba(0,0,0,.4),0 1px 0 rgba(22,135,255,.16)}
 .label-home .label-header{animation:label-header-in .65s ease both}

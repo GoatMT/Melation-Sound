@@ -8,6 +8,7 @@
   --release-muted:#7c8577;
   background:var(--release-bg);
   color:#ece9de;
+  color-scheme:dark;
 }
 .release-page .release-main{position:relative;z-index:1}
 .release-page .hero{position:relative;padding:88px 0 100px;border-bottom:1px solid var(--release-line)}
