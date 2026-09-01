@@ -8,7 +8,7 @@
 
   var catalog = [
     { title: 'A Broken Dream', meta: 'Album · Osama, MT', action: 'Open album', href: 'albums/a-broken-dream/index.html', terms: 'a broken dream album osama mt' },
-    { title: 'Location Unknown', meta: 'Upcoming album · MT · 2 tracks announced', action: 'Open album', href: 'albums/location-unknown/index.html', terms: 'location unknown upcoming album mt cream soda crush my people next release' },
+    { title: 'Location Unknown', meta: 'Upcoming album · MT · 3 tracks announced', action: 'Open album', href: 'albums/location-unknown/index.html', terms: 'location unknown upcoming album mt cream soda crush my people sources next release' },
     { title: '10:20', meta: 'Single · MT', action: 'Open single', href: 'singles/10-20/index.html', terms: '10 20 1020 single mt' },
     { title: 'A Dreams A Mystery', meta: 'Song · Osama, MT · A Broken Dream', action: 'Open song page', href: 'songs/song.html?track=01', terms: 'a dreams a mystery song osama mt' },
     { title: 'Nightmare Fuel', meta: 'Song · Osama, MT and Adam · A Broken Dream', action: 'Open song page', href: 'songs/song.html?track=02', terms: 'nightmare fuel song osama mt adam' },
