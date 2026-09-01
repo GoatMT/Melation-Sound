@@ -39,6 +39,8 @@ body.label-page::after{background:radial-gradient(ellipse at center,transparent 
 .album-card-label{margin:20px 0 8px;color:#8cff3e;font:11px 'Space Mono',monospace;letter-spacing:.15em;text-transform:uppercase}
 .album-card h2{margin:0 0 6px;font:34px 'Bebas Neue',sans-serif;letter-spacing:.06em}
 .album-card p{margin:0;color:var(--label-muted);font-size:14px;line-height:1.5}
+.album-card-advisory{display:inline-flex;align-items:center;gap:7px;margin-top:16px;padding:5px 8px;color:#ffb1b1!important;background:rgba(115,20,28,.24);border:1px solid rgba(230,83,83,.58);font:9px 'Space Mono',monospace!important;letter-spacing:.1em;text-transform:uppercase}
+.album-card-advisory::before{content:'!';display:grid;place-items:center;width:14px;height:14px;color:#26070a;background:#e65353;border-radius:50%;font:bold 10px Arial,sans-serif;letter-spacing:0}
 .album-card-enter{display:block;margin-top:22px;color:#fff;font:12px 'Space Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
 .album-card-enter::after{content:'  →';color:#8cff3e}
 .single-catalog-card{background:linear-gradient(145deg,#0d1118,#05070a);border-color:rgba(98,178,255,.34)}

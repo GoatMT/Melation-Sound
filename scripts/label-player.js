@@ -7,7 +7,10 @@
   var ovoCatalog = ovoPage && Array.isArray(window.OVO_DRAKE_CATALOG) ? window.OVO_DRAKE_CATALOG : [];
   var privateReleaseLocked = privateReleasePage && document.body.classList.contains('private-locked');
   var tracks = privateReleasePage
-    ? [{ id:'10-20', name: '10:20', artist: 'MT', src: 'singles/10-20/assets/MT - 1020.MP3', art: 'singles/10-20/assets/1020.png', page: 'songs/song.html?track=10-20', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' }]
+    ? [
+        { id:'10-20', name: '10:20 (Explicit)', artist: 'MT', src: 'singles/10-20/assets/MT - 1020.MP3', art: 'singles/10-20/assets/1020.png', page: 'songs/song.html?track=10-20', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' },
+        { id:'10-20-clean', name: '10:20 (Clean)', artist: 'MT', src: 'singles/10-20/assets/MT - 1020 not explicit.MP3', art: 'singles/10-20/assets/1020.png', page: 'songs/song.html?track=10-20-clean', length: '00:02:43', bitrate: '192kbps', channels: '2 (stereo)', sampleRate: '44.100 kHz' }
+      ]
     : (ovoPage && ovoCatalog.length ? ovoCatalog.map(function (track) { return Object.assign({}, track); }) : [
         { id:'01', name: 'A Dreams A Mystery', artist: 'Osama, MT', src: 'albums/a-broken-dream/assets/a-dreams-a-mystery.mp3', art: 'albums/a-broken-dream/assets/album-cover.png', page: 'songs/song.html?track=01' },
         { id:'02', name: 'Nightmare Fuel', artist: 'Osama, MT and Adam', src: 'albums/a-broken-dream/assets/Nightmare Fuel.MP3', art: 'albums/a-broken-dream/assets/Nightmare Fuel.png', page: 'songs/song.html?track=02' },
@@ -17,7 +20,8 @@
     { id:'01', name:'A Dreams A Mystery', artist:'Osama, MT', src:'albums/a-broken-dream/assets/a-dreams-a-mystery.mp3', art:'albums/a-broken-dream/assets/album-cover.png', page:'songs/song.html?track=01' },
     { id:'02', name:'Nightmare Fuel', artist:'Osama, MT and Adam', src:'albums/a-broken-dream/assets/Nightmare Fuel.MP3', art:'albums/a-broken-dream/assets/Nightmare Fuel.png', page:'songs/song.html?track=02' },
     { id:'11', name:"Nawaf's Stole Pain", artist:'Bassam', src:"albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", art:"albums/a-broken-dream/assets/Nawaf's Stole Pain.png", page:'songs/song.html?track=11', exclusive:true },
-    { id:'10-20', name:'10:20', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' }
+    { id:'10-20', name:'10:20 (Explicit)', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' },
+    { id:'10-20-clean', name:'10:20 (Clean)', artist:'MT', src:'singles/10-20/assets/MT - 1020 not explicit.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20-clean' }
   ];
   function pageCatalog() { return ovoPage && ovoCatalog.length ? ovoCatalog : ALL_TRACKS; }
   var PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
@@ -424,7 +428,7 @@
     if (index < 0) {
       // A playlist may not contain the song whose own page was opened. Restore
       // the appropriate catalog queue so the page can always play its own song.
-      tracks = (privateReleasePage ? [{ id:'10-20', name:'10:20', artist:'MT', src:'singles/10-20/assets/MT - 1020.MP3', art:'singles/10-20/assets/1020.png', page:'songs/song.html?track=10-20' }] : pageCatalog())
+      tracks = (privateReleasePage ? tracks : pageCatalog())
         .map(function (track) { return Object.assign({}, track); });
       index = tracks.findIndex(function (track) { return track.id === trackId; });
       currentIndex = -1;

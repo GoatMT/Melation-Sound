@@ -11,7 +11,7 @@
     '09': { title:'Doomsday', type:'Album track', artist:'Osama, MT', release:'A Broken Dream', date:'Not posted', back:'albums/a-broken-dream/index.html', art:'albums/a-broken-dream/assets/album-cover.png', status:'Out Dec 20, 2026', lyrics:'Lyrics will be available when this track is released.' },
     '10': { title:'A Broken Dream (Outro)', type:'Album track', artist:'Osama, MT', release:'A Broken Dream', date:'Not posted', back:'albums/a-broken-dream/index.html', art:'albums/a-broken-dream/assets/album-cover.png', status:'Out Dec 20, 2026', lyrics:'Lyrics will be available when this track is released.' },
     '11': { title:"Nawaf's Stole Pain", type:'Album bonus track', artist:'Bassam', release:'A Broken Dream', date:'August 26, 2026', back:'albums/a-broken-dream/index.html', art:"albums/a-broken-dream/assets/Nawaf's Stole Pain.png", audio:"albums/a-broken-dream/assets/Nawaf's Stole Pain.MP3", length:'00:01:27', bitrate:'192kbps', sampleRate:'44.100 kHz', status:'Available now', lyrics:`My bars so slick Nawaf is already is sick he can’t be seen because he is already on my stick, sorry Nawaf I ain’t so colorful but you insisted so I had to be probable. Listen here, this ain’t the ending I am gonna be fenting gonna be high higher than the sky while you are molesting a amphebean with your stick. Ey gotta call from my neighbour talm bout some “hey neighbour have you seen my nigger?” I told him yeah he’s busy getting ragebaiting while I write my bars coming from mars it’s so fire I am making my empire aswell as he face down leg up. Hey Adam you think your not jncluded nigga your on the same boat so y don’t you go before I cloack my dick in your mouth. You take so many showers but you don’t brush your vouchers your breath so stick they sleep like a bangali deli from New Delhi, I am gonna end it with Nawaf hush Adam brush and Osama n MT judge.` },
-    '10-20': { title:'10:20', type:'Single', artist:'MT', release:'Melation Sound single', date:'August 24, 2026', back:'singles/10-20/index.html', art:'singles/10-20/assets/1020.png', audio:'singles/10-20/assets/MT - 1020.MP3', length:'00:02:43', bitrate:'192kbps', sampleRate:'44.100 kHz', status:'Available now', private:true, gateEnabled:false, lyrics:`(Yea)
+    '10-20': { title:'10:20 (Explicit)', type:'Single · Explicit version', artist:'MT', release:'Melation Sound single', date:'August 24, 2026', back:'singles/10-20/index.html', art:'singles/10-20/assets/1020.png', audio:'singles/10-20/assets/MT - 1020.MP3', length:'00:02:43', bitrate:'192kbps', sampleRate:'44.100 kHz', status:'Available now', private:true, gateEnabled:false, lyrics:`(Yea)
 (Yea)
 10:20
 (Yea)
@@ -87,7 +87,8 @@ Whole city know the track
 (Yea)
 10-20
 (Yea)
-10-20` }
+10-20` },
+    '10-20-clean': { title:'10:20 (Clean)', type:'Single · Clean version', artist:'MT', release:'Melation Sound single', date:'August 24, 2026', back:'singles/10-20/index.html', art:'singles/10-20/assets/1020.png', audio:'singles/10-20/assets/MT - 1020 not explicit.MP3', length:'00:02:43', bitrate:'192kbps', sampleRate:'44.100 kHz', status:'Available now', private:true, gateEnabled:false, lyrics:'Lyrics for the clean version have not been published yet.' }
   };
   var params = new URLSearchParams(window.location.search);
   var key = params.get('track') || '01';
@@ -97,7 +98,7 @@ Whole city know the track
   // The shared player can be restored with a shuffled or custom playlist queue.
   // Keep the song's actual ID on this page instead of relying on its position in
   // whichever queue happens to be active.
-  var labelTrackIndex = track.audio ? (track.private ? 0 : ({'01':0,'02':1,'11':2}[key] || 0)) : -1;
+  var labelTrackIndex = track.audio ? (track.private ? (key === '10-20-clean' ? 1 : 0) : ({'01':0,'02':1,'11':2}[key] || 0)) : -1;
   var labelMount = $('label-player-mount');
   if (labelMount) {
     labelMount.setAttribute('data-label-start', labelTrackIndex);
@@ -112,7 +113,7 @@ Whole city know the track
   function updateEngagement(){ var stats=engagementStats(); $('songViewCount').textContent=stats.views; $('songLikeCount').textContent=stats.likes; $('songDislikeCount').textContent=stats.dislikes; $('songLike').setAttribute('aria-pressed',stats.reaction==='like'); $('songDislike').setAttribute('aria-pressed',stats.reaction==='dislike'); $('songLike').classList.toggle('is-active',stats.reaction==='like'); $('songDislike').classList.toggle('is-active',stats.reaction==='dislike'); }
   function startEngagement(){ if(window.MelationCommunity && window.MelationCommunity.recordView){ window.MelationCommunity.recordView(key); updateEngagement(); } else if(window.MelationEngagement){ window.MelationEngagement.recordView(key); updateEngagement(); } }
   function render(){
-    $('songType').textContent=track.type; $('songTitle').textContent=track.title; $('songArtist').textContent=track.artist; $('songRelease').textContent=track.release; $('songBack').href=track.back; $('songArt').src=track.art; $('songArt').alt=track.title+' artwork'; $('songTrackNumber').textContent=key==='10-20'?'Single':'Track '+key;
+    $('songType').textContent=track.type; $('songTitle').textContent=track.title; $('songArtist').textContent=track.artist; $('songRelease').textContent=track.release; $('songBack').href=track.back; $('songArt').src=track.art; $('songArt').alt=track.title+' artwork'; $('songTrackNumber').textContent=key.indexOf('10-20')===0?'Single':'Track '+key;
     document.title=track.title+' · Melation Sound'; $('lyricsStatus').textContent=track.gateEnabled?'Private song':track.status; $('songLyrics').textContent=track.lyrics; $('songLyrics').classList.toggle('is-empty',!track.audio); $('songDetails').innerHTML=''; [['Release type',track.type],['Artist',track.artist],['Release',track.release],['Date posted',track.date],['Status',track.status],['Length',track.length||'Not available'],['Bit rate',track.bitrate||'Not available'],['Audio sample rate',track.sampleRate||'Not available']].forEach(function(item){var cell=document.createElement('div'),label=document.createElement('small'),value=document.createElement('strong');label.textContent=item[0];value.textContent=item[1];cell.append(label,value);$('songDetails').appendChild(cell);});
     $('songPlayTop').disabled=!track.audio; if(!track.audio){$('songPlayTop').textContent='Not released';}
   }
